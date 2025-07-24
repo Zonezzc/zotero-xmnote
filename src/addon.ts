@@ -2,6 +2,10 @@ import { config } from "../package.json";
 import { ColumnOptions, DialogHelper } from "zotero-plugin-toolkit";
 import hooks from "./hooks";
 import { createZToolkit } from "./utils/ztoolkit";
+import { ExportDialog } from "./modules/ui/exportDialog";
+import { getDataExporter } from "./modules/exporter";
+import { configManager } from "./modules/config/settings";
+import { getXMnoteApiClient } from "./modules/xmnote/api";
 
 class Addon {
   public data: {
@@ -35,7 +39,12 @@ class Addon {
       ztoolkit: createZToolkit(),
     };
     this.hooks = hooks;
-    this.api = {};
+    this.api = {
+      ExportDialog,
+      getDataExporter,
+      configManager,
+      getXMnoteApiClient,
+    };
   }
 }
 

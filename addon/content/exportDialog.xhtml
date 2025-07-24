@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE window>
+
+<window
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        id="zotero-xmnote-export-dialog"
+        title="Export to XMnote"
+        width="800"
+        height="600"
+        style="min-width: 600px; min-height: 400px"
+>
+    <linkset>
+        <html:link rel="localization" href="zonezzc-exportDialog.ftl" />
+    </linkset>
+
+    <style>
+        .dialog-container {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .section {
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 12px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .filter-label {
+            min-width: 120px;
+            margin-right: 8px;
+        }
+
+        .filter-select {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .item-list-container {
+            flex: 1;
+            min-height: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .item-entry {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-left: 3px solid #007acc;
+            background-color: #f9f9f9;
+        }
+
+        .item-entry label {
+            cursor: pointer;
+            display: block;
+        }
+
+        .item-entry input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .progress-container {
+            margin-top: 12px;
+            display: none;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #007acc;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .message {
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .preview-area {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            margin-top: 8px;
+            display: none;
+            background-color: #f9f9f9;
+        }
+
+        .preview-item {
+            margin-bottom: 16px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        .preview-item h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+        }
+
+        .preview-item pre {
+            background-color: #f8f8f8;
+            padding: 8px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .status-text {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+
+    <vbox class="dialog-container">
+        <!-- 筛选选项 -->
+        <vbox class="section">
+            <html:div class="section-title">Filter Options</html:div>
+
+            <hbox class="filter-row">
+                <html:label class="filter-label">Item Types:</html:label>
+                <html:select
+                        id="item-types-select"
+                        class="filter-select filter-input"
+                        multiple="true"
+                        size="3"
+                >
+                    <!-- 选项将通过JavaScript动态填充 -->
+                </html:select>
+            </hbox>
+
+            <hbox class="filter-row">
+                <html:label class="filter-label">Tags:</html:label>
+                <html:select
+                        id="tags-select"
+                        class="filter-select filter-input"
+                        multiple="true"
+                        size="3"
+                >
+                    <!-- 选项将通过JavaScript动态填充 -->
+                </html:select>
+            </hbox>
+
+            <hbox class="filter-row">
+                <html:label class="filter-label">Collections:</html:label>
+                <html:select
+                        id="collections-select"
+                        class="filter-select filter-input"
+                        multiple="true"
+                        size="3"
+                >
+                    <!-- 选项将通过JavaScript动态填充 -->
+                </html:select>
+            </hbox>
+        </vbox>
+
+        <!-- 导出选项 -->
+        <vbox class="section">
+            <html:div class="section-title">Export Options</html:div>
+
+            <hbox>
+                <checkbox
+                        id="include-notes-checkbox"
+                        checked="true"
+                        label="Include Notes"
+                />
+                <checkbox
+                        id="include-annotations-checkbox"
+                        checked="true"
+                        label="Include Annotations"
+                        style="margin-left: 16px"
+                />
+                <checkbox
+                        id="include-metadata-checkbox"
+                        checked="true"
+                        label="Include Metadata"
+                        style="margin-left: 16px"
+                />
+            </hbox>
+        </vbox>
+
+        <!-- 条目列表 -->
+        <vbox
+                class="section"
+                style="flex: 1; display: flex; flex-direction: column"
+        >
+            <hbox
+                    style="
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+        "
+            >
+                <html:div class="section-title">Items to Export</html:div>
+                <hbox>
+                    <button
+                            id="select-all-button"
+                            label="Select All"
+                            style="margin-right: 8px"
+                    />
+                    <button id="select-none-button" label="Select None" />
+                </hbox>
+            </hbox>
+
+            <html:div id="item-list" class="item-list-container">
+                <!-- 条目列表将通过JavaScript动态填充 -->
+                <html:p style="text-align: center; color: #666; margin-top: 50px"
+                >Loading items...
+                </html:p
+                >
+            </html:div>
+
+            <html:div id="status-text" class="status-text" style="margin-top: 8px"
+            >Ready
+            </html:div
+            >
+        </vbox>
+
+        <!-- 预览区域 -->
+        <html:div id="preview-area" class="preview-area">
+            <!-- 预览内容将通过JavaScript动态填充 -->
+        </html:div>
+
+        <!-- 进度显示 -->
+        <vbox id="progress-container" class="progress-container">
+            <html:div class="progress-bar-container">
+                <html:div id="progress-bar" class="progress-bar"></html:div>
+            </html:div>
+            <html:div
+                    id="progress-text"
+                    style="text-align: center; font-size: 12px; color: #666"
+            >Processing...
+            </html:div
+            >
+        </vbox>
+
+        <!-- 消息区域 -->
+        <html:div id="message-area" class="message"></html:div>
+
+        <!-- 按钮行 -->
+        <hbox class="button-row">
+            <hbox class="button-group">
+                <button id="preview-button" label="Preview" />
+            </hbox>
+
+            <hbox class="button-group">
+                <button id="cancel-button" label="Cancel" />
+                <button id="export-button" label="Export to XMnote" default="true" />
+            </hbox>
+        </hbox>
+    </vbox>
+
+    <!-- 初始化脚本 -->
+    <script>
+      <![CDATA[
+      // 简化的初始化代码
+      function initializeDialog() {
+        try {
+          // 检查Zotero对象
+          if (typeof Zotero === "undefined") {
+            // 尝试获取父窗口的Zotero对象
+            if (window.opener && window.opener.Zotero) {
+              window.Zotero = window.opener.Zotero;
+            } else if (window.parent && window.parent.Zotero) {
+              window.Zotero = window.parent.Zotero;
+            } else {
+              console.error("Zotero object not accessible");
+              return;
+            }
+          }
+
+          // 检查插件是否已加载
+          if (Zotero.zonezzc && Zotero.zonezzc.api) {
+            const { ExportDialog } = Zotero.zonezzc.api;
+
+            if (ExportDialog) {
+              console.log("Initializing export dialog...");
+              const dialog = new ExportDialog(window);
+              dialog.initialize();
+            } else {
+              console.error("ExportDialog not found in plugin API");
+            }
+          } else {
+            console.error("Plugin API not available");
+          }
+        } catch (error) {
+          console.error("Failed to initialize dialog:", error);
+        }
+      }
+
+      // 多种初始化时机
+      if (document.readyState === "complete") {
+        initializeDialog();
+      } else {
+        window.addEventListener("load", initializeDialog);
+        document.addEventListener("DOMContentLoaded", initializeDialog);
+      }
+      ]]>
+    </script>
+</window>

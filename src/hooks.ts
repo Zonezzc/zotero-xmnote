@@ -1,13 +1,9 @@
-import {
-  BasicExampleFactory,
-  HelperExampleFactory,
-  KeyExampleFactory,
-  PromptExampleFactory,
-  UIExampleFactory,
-} from "./modules/examples";
 import { getString, initLocale } from "./utils/locale";
-import { registerPrefsScripts } from "./modules/preferenceScript";
+import { registerPrefsScripts as registerXMnotePrefsScripts } from "./modules/config/preferences";
 import { createZToolkit } from "./utils/ztoolkit";
+import { logger } from "./utils/logger";
+import { configManager } from "./modules/config/settings";
+import { simpleExportTest } from "./modules/simple-export";
 
 async function onStartup() {
   await Promise.all([
@@ -17,6 +13,30 @@ async function onStartup() {
   ]);
 
   initLocale();
+
+  logger.info("Starting XMnote plugin initialization");
+
+  // 注册首选项面板
+  registerXMnotePrefs();
+
+  // 初始化配置管理器
+  configManager.getConfig();
+
+  // 注册XMnote菜单项
+  try {
+    const { MenuHandler } = await import("./modules/ui/menuHandler");
+    const menuHandler = MenuHandler.getInstance();
+    menuHandler.registerMenuItems();
+
+    // 创建全局测试对象（仅用于开发测试）
+    (Zotero as any).XMnoteTest = {
+      runTest: simpleExportTest,
+    };
+
+    logger.info("XMnote menus registered successfully");
+  } catch (error) {
+    logger.error("Failed to register XMnote menus:", error);
+  }
 
   // Example functions disabled for plugin development
   // BasicExampleFactory.registerPrefs();
@@ -89,12 +109,39 @@ async function onMainWindowUnload(win: Window): Promise<void> {
 }
 
 function onShutdown(): void {
+  logger.info("Shutting down XMnote plugin");
+
+  // 清理全局对象
+  try {
+    delete (Zotero as any).XMnoteTest;
+  } catch (error) {
+    logger.error("Failed to cleanup global objects:", error);
+  }
+
   ztoolkit.unregisterAll();
   addon.data.dialog?.window?.close();
   // Remove addon object
   addon.data.alive = false;
   // @ts-expect-error - Plugin instance is not typed
   delete Zotero[addon.data.config.addonInstance];
+}
+
+async function onMenuCommand(command: string): Promise<void> {
+  logger.info(`Menu command received: ${command}`);
+
+  const { MenuHandler } = await import("./modules/ui/menuHandler");
+  const menuHandler = MenuHandler.getInstance();
+
+  switch (command) {
+    case "export-all":
+      await menuHandler.handleExportAll();
+      break;
+    case "export-selected":
+      await menuHandler.handleExportSelected();
+      break;
+    default:
+      logger.warn(`Unknown menu command: ${command}`);
+  }
 }
 
 /**
@@ -130,7 +177,8 @@ async function onNotify(
 async function onPrefsEvent(type: string, data: { [key: string]: any }) {
   switch (type) {
     case "load":
-      registerPrefsScripts(data.window);
+      // registerPrefsScripts(data.window); // 示例首选项脚本已禁用
+      registerXMnotePrefsScripts(data.window);
       break;
     default:
       return;
@@ -174,6 +222,21 @@ function onDialogEvents(type: string) {
   // }
 }
 
+// 注册XMnote首选项面板
+function registerXMnotePrefs() {
+  try {
+    Zotero.PreferencePanes.register({
+      pluginID: addon.data.config.addonID,
+      src: rootURI + "content/preferences.xhtml",
+      label: "XMnote",
+      image: `chrome://${addon.data.config.addonRef}/content/icons/favicon.png`,
+    });
+    logger.info("XMnote preferences panel registered");
+  } catch (error) {
+    logger.error("Failed to register preferences panel:", error);
+  }
+}
+
 // Add your hooks here. For element click, etc.
 // Keep in mind hooks only do dispatch. Don't add code that does real jobs in hooks.
 // Otherwise the code would be hard to read and maintain.
@@ -187,4 +250,5 @@ export default {
   onPrefsEvent,
   onShortcuts,
   onDialogEvents,
+  onMenuCommand,
 };
