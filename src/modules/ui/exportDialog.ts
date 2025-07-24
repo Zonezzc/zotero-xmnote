@@ -42,8 +42,8 @@ export class ExportDialog {
             fontSize: "18px",
             fontWeight: "bold",
             marginBottom: "15px",
-            color: "#333,
-          ,
+            color: "#333",
+          },
         })
         .addCell(1, 0, {
           tag: "h2",
@@ -53,20 +53,20 @@ export class ExportDialog {
             fontWeight: "bold",
             marginBottom: "10px",
             marginTop: "15px,
-          ,
+          },
         })
         .addCell(2, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
-            for: "include-notes-checkbox,
+            for: "include-notes-checkbox"
           },
           properties: { innerHTML: "Include Notes" },
           styles: {
             display: "block",
             marginBottom: "5px",
-            fontWeight: "normal,
-          ,
+            fontWeight: "normal"
+          },
         })
         .addCell(
           2,
@@ -78,23 +78,23 @@ export class ExportDialog {
             attributes: {
               "data-bind": "includeNotes",
               "data-prop": "checked",
-              type: "checkbox,
-            ,
+              type: "checkbox"
+            },
           },
-          fals,
+          false
         )
         .addCell(3, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
-            for: "include-annotations-checkbox,
+            for: "include-annotations-checkbox"
           },
           properties: { innerHTML: "Include Annotations" },
           styles: {
             display: "block",
             marginBottom: "5px",
-            fontWeight: "normal,
-          ,
+            fontWeight: "normal"
+          },
         })
         .addCell(
           3,
@@ -106,23 +106,23 @@ export class ExportDialog {
             attributes: {
               "data-bind": "includeAnnotations",
               "data-prop": "checked",
-              type: "checkbox,
-            ,
+              type: "checkbox"
+            },
           },
-          fals,
+          false
         )
         .addCell(4, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
-            for: "include-metadata-checkbox,
+            for: "include-metadata-checkbox"
           },
           properties: { innerHTML: "Include Metadata" },
           styles: {
             display: "block",
             marginBottom: "5px",
-            fontWeight: "normal,
-          ,
+            fontWeight: "normal"
+          },
         })
         .addCell(
           4,
@@ -134,10 +134,10 @@ export class ExportDialog {
             attributes: {
               "data-bind": "includeMetadata",
               "data-prop": "checked",
-              type: "checkbox,
-            ,
+              type: "checkbox"
+            },
           },
-          fals,
+          false
         )
         .addCell(5, 0, {
           tag: "div",
@@ -151,8 +151,8 @@ export class ExportDialog {
             padding: "10px",
             backgroundColor: "#f0f0f0",
             borderRadius: "4px",
-            fontSze: "12px",
-           color: "#666",
+            fontSize: "12px",
+            color: "#666"
           },
         })
         .addButton("Export", "export", {
@@ -166,14 +166,14 @@ export class ExportDialog {
             // 显示进度窗口
             const progressWin = new ztoolkit.ProgressWindow("XMnote Export", {
               closeOnClick: false,
-              closeTime: -1
+              closeTime: -1,
             });
 
             progressWin
               .createLine({
                 text: "Initializing export...",
                 type: "default",
-                progress: 0
+                progress: 0,
               })
               .show();
 
@@ -184,18 +184,18 @@ export class ExportDialog {
 
               progressWin.changeLine({
                 text: "Loading items from Zotero...",
-                progress: 10
+                progress: 10,
               });
 
               // 获取所有条目
               const allItems = await Zotero.Items.getAll(
-                Zotero.Libraries.userLibraryID
+                Zotero.Libraries.userLibraryID,
               );
               logger.info(`Found ${allItems.length} items to export`);
 
               progressWin.changeLine({
                 text: `Processing ${allItems.length} items...`,
-                progress: 20
+                progress: 20,
               });
 
               // 使用完整的导出流程
@@ -212,7 +212,7 @@ export class ExportDialog {
 
                   progressWin.changeLine({
                     text: `${progress.message} (${progress.current}/${progress.total})`,
-                    progress: progressPercent
+                    progress: progressPercent,
                   });
                 },
               };
@@ -223,7 +223,7 @@ export class ExportDialog {
               progressWin.changeLine({
                 text: result.summary,
                 type: result.success ? "success" : "fail",
-                progress: 100
+                progress: 100,
               });
 
               // 3秒后自动关闭
@@ -237,7 +237,7 @@ export class ExportDialog {
               progressWin.changeLine({
                 text: `Export failed: ${error instanceof Error ? error.message : "Unknown error"}`,
                 type: "fail",
-                progress: 100
+                progress: 100,
               });
 
               setTimeout(() => {
