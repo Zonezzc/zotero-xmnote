@@ -303,11 +303,8 @@ export class DataExporter {
   ): Promise<BatchImportResult> {
     logger.info(`Importing ${notes.length} notes to XMnote`);
 
-    // 验证连接
-    const connectionOk = await this.apiClient.testConnection();
-    if (!connectionOk) {
-      throw new Error("Cannot connect to XMnote server");
-    }
+    // 导出流程中不进行连接测试，避免创建测试数据
+    // 连接测试仅在配置面板中使用
 
     // 执行批量导入
     const batchSize =
