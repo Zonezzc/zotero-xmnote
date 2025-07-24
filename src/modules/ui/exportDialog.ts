@@ -20,103 +20,239 @@ export class ExportDialog {
     try {
       logger.info("Opening export dialog...");
 
-      // 使用简单的确认对话框进行测试
-      const result = Services.prompt.confirm(
-        null as any,
-        "XMnote Export",
-        "Do you want to export all items to XMnote?\n\n(This is a simplified dialog for testing. The full export dialog will be implemented in the next version.)",
-      );
+      // 创建对话框数据对象
+      const dialogData: { [key: string | number]: any } = {
+        includeNotes: true,
+        includeAnnotations: true,
+        includeMetadata: true,
+        loadCallback: () => {
+          logger.info("Export dialog opened");
+        },
+        unloadCallback: () => {
+          logger.info("Export dialog closed");
+        },
+      };
 
-      if (result) {
-        logger.info("User confirmed export, starting export process...");
+      // 创建ztoolkit对话框
+      const dialogHelper = new ztoolkit.Dialog(8, 2)
+        .addCell(0, 0, {
+          tag: "h1",
+          properties: { innerHTML: "Export to XMnote" },
+          styles: {
+            fontSize: "18px",
+            fontWeight: "bold",
+            marginBottom: "15px",
+            color: "#333,
+          ,
+        })
+        .addCell(1, 0, {
+          tag: "h2",
+          properties: { innerHTML: "Export Options" },
+          styles: {
+            fontSize: "14px",
+            fontWeight: "bold",
+            marginBottom: "10px",
+            marginTop: "15px,
+          ,
+        })
+        .addCell(2, 0, {
+          tag: "label",
+          namespace: "html",
+          attributes: {
+            for: "include-notes-checkbox,
+          },
+          properties: { innerHTML: "Include Notes" },
+          styles: {
+            display: "block",
+            marginBottom: "5px",
+            fontWeight: "normal,
+          ,
+        })
+        .addCell(
+          2,
+          1,
+          {
+            tag: "input",
+            namespace: "html",
+            id: "include-notes-checkbox",
+            attributes: {
+              "data-bind": "includeNotes",
+              "data-prop": "checked",
+              type: "checkbox,
+            ,
+          },
+          fals,
+        )
+        .addCell(3, 0, {
+          tag: "label",
+          namespace: "html",
+          attributes: {
+            for: "include-annotations-checkbox,
+          },
+          properties: { innerHTML: "Include Annotations" },
+          styles: {
+            display: "block",
+            marginBottom: "5px",
+            fontWeight: "normal,
+          ,
+        })
+        .addCell(
+          3,
+          1,
+          {
+            tag: "input",
+            namespace: "html",
+            id: "include-annotations-checkbox",
+            attributes: {
+              "data-bind": "includeAnnotations",
+              "data-prop": "checked",
+              type: "checkbox,
+            ,
+          },
+          fals,
+        )
+        .addCell(4, 0, {
+          tag: "label",
+          namespace: "html",
+          attributes: {
+            for: "include-metadata-checkbox,
+          },
+          properties: { innerHTML: "Include Metadata" },
+          styles: {
+            display: "block",
+            marginBottom: "5px",
+            fontWeight: "normal,
+          ,
+        })
+        .addCell(
+          4,
+          1,
+          {
+            tag: "input",
+            namespace: "html",
+            id: "include-metadata-checkbox",
+            attributes: {
+              "data-bind": "includeMetadata",
+              "data-prop": "checked",
+              type: "checkbox,
+            ,
+          },
+          fals,
+        )
+        .addCell(5, 0, {
+          tag: "div",
+          properties: {
+            innerHTML:
+              "This will export all Zotero items with their notes and annotations to your XMnote application.",
+          },
+          styles: {
+            marginTop: "15px",
+            marginBottom: "15px",
+            padding: "10px",
+            backgroundColor: "#f0f0f0",
+            borderRadius: "4px",
+            fontSze: "12px",
+           color: "#666",
+          },
+        })
+        .addButton("Export", "export", {
+          callback: async (e) => {
+            // 开始导出流程
+            logger.info("User confirmed export, starting export process...");
 
-        // 显示进度窗口
-        const progressWin = new ztoolkit.ProgressWindow("XMnote Export", {
-          closeOnClick: false,
-          closeTime: -1,
-        });
+            // 关闭对话框
+            dialogHelper.window?.close();
 
-        progressWin
-          .createLine({
-            text: "Initializing export...",
-            type: "default",
-            progress: 0,
-          })
-          .show();
+            // 显示进度窗口
+            const progressWin = new ztoolkit.ProgressWindow("XMnote Export", {
+              closeOnClick: false,
+              closeTime: -1
+            });
 
-        try {
-          // 获取导出器和API客户端
-          const { getDataExporter } = await import("../exporter");
-          const { getXMnoteApiClient } = await import("../xmnote/api");
+            progressWin
+              .createLine({
+                text: "Initializing export...",
+                type: "default",
+                progress: 0
+              })
+              .show();
 
-          const exporter = getDataExporter();
-          const apiClient = getXMnoteApiClient();
-
-          progressWin.changeLine({
-            text: "Loading items from Zotero...",
-            progress: 10,
-          });
-
-          // 获取所有条目
-          const allItems = await Zotero.Items.getAll(
-            Zotero.Libraries.userLibraryID,
-          );
-          logger.info(`Found ${allItems.length} items to export`);
-
-          progressWin.changeLine({
-            text: `Processing ${allItems.length} items...`,
-            progress: 20,
-          });
-
-          // 使用完整的导出流程
-          const exportOptions = {
-            includeNotes: true,
-            includeAnnotations: true,
-            includeMetadata: true,
-            batchSize: 10,
-            onProgress: (progress: any) => {
-              const progressPercent =
-                progress.total > 0
-                  ? 20 + (progress.current / progress.total) * 60
-                  : 20;
+            try {
+              // 获取导出器
+              const { getDataExporter } = await import("../exporter");
+              const exporter = getDataExporter();
 
               progressWin.changeLine({
-                text: `${progress.message} (${progress.current}/${progress.total})`,
-                progress: progressPercent,
+                text: "Loading items from Zotero...",
+                progress: 10
               });
-            },
-          };
 
-          const result = await exporter.export(exportOptions);
+              // 获取所有条目
+              const allItems = await Zotero.Items.getAll(
+                Zotero.Libraries.userLibraryID
+              );
+              logger.info(`Found ${allItems.length} items to export`);
 
-          // 显示结果
-          progressWin.changeLine({
-            text: result.summary,
-            type: result.success ? "success" : "fail",
-            progress: 100,
-          });
+              progressWin.changeLine({
+                text: `Processing ${allItems.length} items...`,
+                progress: 20
+              });
 
-          // 3秒后自动关闭
-          setTimeout(() => {
-            progressWin.close();
-          }, 3000);
+              // 使用完整的导出流程
+              const exportOptions = {
+                includeNotes: dialogData.includeNotes,
+                includeAnnotations: dialogData.includeAnnotations,
+                includeMetadata: dialogData.includeMetadata,
+                batchSize: 10,
+                onProgress: (progress: any) => {
+                  const progressPercent =
+                    progress.total > 0
+                      ? 20 + (progress.current / progress.total) * 60
+                      : 20;
 
-          logger.info(`Export process completed: ${result.summary}`);
-        } catch (error) {
-          logger.error("Export process failed:", error);
-          progressWin.changeLine({
-            text: `Export failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-            type: "fail",
-            progress: 100,
-          });
+                  progressWin.changeLine({
+                    text: `${progress.message} (${progress.current}/${progress.total})`,
+                    progress: progressPercent
+                  });
+                },
+              };
 
-          setTimeout(() => {
-            progressWin.close();
-          }, 5000);
-        }
-      } else {
-        logger.info("User cancelled export");
-      }
+              const result = await exporter.export(exportOptions);
+
+              // 显示结果
+              progressWin.changeLine({
+                text: result.summary,
+                type: result.success ? "success" : "fail",
+                progress: 100
+              });
+
+              // 3秒后自动关闭
+              setTimeout(() => {
+                progressWin.close();
+              }, 3000);
+
+              logger.info(`Export process completed: ${result.summary}`);
+            } catch (error) {
+              logger.error("Export process failed:", error);
+              progressWin.changeLine({
+                text: `Export failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+                type: "fail",
+                progress: 100
+              });
+
+              setTimeout(() => {
+                progressWin.close();
+              }, 5000);
+            }
+          },
+        })
+        .addButton("Cancel", "cancel")
+        .setDialogData(dialogData)
+        .open("Export to XMnote");
+
+      // 等待对话框关闭
+      await dialogData.unloadLock.promise;
+      logger.info("Export dialog process completed");
     } catch (error) {
       logger.error("Failed to show export dialog:", error);
       throw error;
