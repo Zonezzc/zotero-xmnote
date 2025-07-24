@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(\"/Applications/Zotero.app/Contents/MacOS/zotero\" --version)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(mkdir:*)",
+      "Bash(pnpm install:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm start:*)"
+    ],
+    "deny": []
+  }
+}
