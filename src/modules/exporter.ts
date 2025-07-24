@@ -28,6 +28,21 @@ export interface ExportOptions {
   onProgress?: (progress: ExportProgress) => void;
 }
 
+export interface SelectiveExportOptions extends ExportOptions {
+  exportScope: "all" | "selected" | "custom";
+  selectedItemIds?: number[];
+  searchQuery?: string;
+  filters?: {
+    itemTypes?: string[];
+    collections?: string[];
+    tags?: string[];
+    dateRange?: {
+      from?: Date;
+      to?: Date;
+    };
+  };
+}
+
 export interface ExportProgress {
   phase: "extracting" | "transforming" | "importing" | "completed" | "error";
   current: number;

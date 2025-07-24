@@ -28,12 +28,17 @@ async function onStartup() {
     const menuHandler = MenuHandler.getInstance();
     menuHandler.registerMenuItems();
 
+    // 注册右键菜单
+    const { ContextMenuHandler } = await import("./modules/ui/contextMenu");
+    ContextMenuHandler.registerItemContextMenu();
+    ContextMenuHandler.registerCollectionContextMenu();
+
     // 创建全局测试对象（仅用于开发测试）
     (Zotero as any).XMnoteTest = {
       runTest: simpleExportTest,
     };
 
-    logger.info("XMnote menus registered successfully");
+    logger.info("XMnote menus and context menus registered successfully");
   } catch (error) {
     logger.error("Failed to register XMnote menus:", error);
   }

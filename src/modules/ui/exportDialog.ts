@@ -1,8 +1,9 @@
 // 导出对话框
 
 import { logger } from "../../utils/logger";
-import type { ExportOptions, ExportProgress } from "../exporter";
+import type { ExportOptions, ExportProgress, SelectiveExportOptions } from "../exporter";
 import { getDataExporter } from "../exporter";
+import { type ZoteroItemInfo } from "./itemSelector";
 
 export class ExportDialog {
   private window: Window;
@@ -15,16 +16,22 @@ export class ExportDialog {
     this.document = window.document;
   }
 
-  // 显示导出对话框
-  static async show(): Promise<void> {
+  // 显示导出对话框（支持预选条目）
+  static async show(preSelectedItems?: ZoteroItemInfo[]): Promise<void> {
     try {
       logger.info("Opening export dialog...");
 
+      // 确定默认导出范围
+      const hasPreSelected = preSelectedItems && preSelectedItems.length > 0;
+      const defaultScope = hasPreSelected ? "selected" : "all";
+
       // 创建对话框数据对象
       const dialogData: { [key: string | number]: any } = {
+        exportScope: defaultScope,
         includeNotes: true,
         includeAnnotations: true,
         includeMetadata: true,
+        selectedItemsInfo: hasPreSelected ? preSelectedItems : [],
         loadCallback: () => {
           logger.info("Export dialog opened");
         },
@@ -33,8 +40,8 @@ export class ExportDialog {
         },
       };
 
-      // 创建ztoolkit对话框
-      const dialogHelper = new ztoolkit.Dialog(8, 2)
+      // 创建ztoolkit对话框（增加行数来容纳新的选项）
+      const dialogHelper = new ztoolkit.Dialog(hasPreSelected ? 12 : 10, 2)
         .addCell(0, 0, {
           tag: "h1",
           properties: { innerHTML: "Export to XMnote" },
@@ -47,15 +54,91 @@ export class ExportDialog {
         })
         .addCell(1, 0, {
           tag: "h2",
+          properties: { innerHTML: "Export Scope" },
+          styles: {
+            fontSize: "14px",
+            fontWeight: "bold",
+            marginBottom: "10px",
+            marginTop: "15px"
+          },
+        })
+        .addCell(2, 0, {
+          tag: "label",
+          namespace: "html",
+          attributes: {
+            for: "scope-all-radio"
+          },
+          properties: { innerHTML: "All Items" },
+          styles: {
+            display: "block",
+            marginBottom: "5px",
+            fontWeight: "normal"
+          }
+        })
+        .addCell(
+          2,
+          1,
+          {
+            tag: "input",
+            namespace: "html",
+            id: "scope-all-radio",
+            attributes: {
+              "data-bind": "exportScope",
+              "data-prop": "checked",
+              type: "radio",
+              name: "exportScope",
+              value: "all"
+            }
+          },
+          false
+        )
+        .addCell(3, 0, {
+          tag: "label",
+          namespace: "html",
+          attributes: {
+            for: "scope-selected-radio"
+          },
+          properties: {
+            innerHTML: hasPreSelected
+              ? `Selected Items (${preSelectedItems!.length})`
+              : "Selected Items"
+          },
+          styles: {
+            display: "block",
+            marginBottom: "5px",
+            fontWeight: "normal",
+            color: hasPreSelected ? "#333" : "#999"
+          }
+        })
+        .addCell(
+          3,
+          1,
+          {
+            tag: "input",
+            namespace: "html",
+            id: "scope-selected-radio",
+            attributes: {
+              "data-bind": "exportScope",
+              "data-prop": "checked",
+              type: "radio",
+              name: "exportScope",
+              value: "selected",
+              disabled: hasPreSelected ? undefined : "true"
+            }
+          },
+          false
+        )
+        .addCell(4, 0, {
+          tag: "h2",
           properties: { innerHTML: "Export Options" },
           styles: {
             fontSize: "14px",
             fontWeight: "bold",
             marginBottom: "10px",
-            marginTop: "15px,
-          },
+            maginTop: "15px"
+          }
         })
-        .addCell(2, 0, {
+        .addCell(5, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
@@ -69,7 +152,7 @@ export class ExportDialog {
           },
         })
         .addCell(
-          2,
+          5,
           1,
           {
             tag: "input",
@@ -83,7 +166,7 @@ export class ExportDialog {
           },
           false
         )
-        .addCell(3, 0, {
+        .addCell(6, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
@@ -97,7 +180,7 @@ export class ExportDialog {
           },
         })
         .addCell(
-          3,
+          6,
           1,
           {
             tag: "input",
@@ -111,7 +194,7 @@ export class ExportDialog {
           },
           false
         )
-        .addCell(4, 0, {
+        .addCell(7, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
@@ -125,7 +208,7 @@ export class ExportDialog {
           },
         })
         .addCell(
-          4,
+          7,
           1,
           {
             tag: "input",
@@ -139,11 +222,13 @@ export class ExportDialog {
           },
           false
         )
-        .addCell(5, 0, {
+        .addCell(8, 0, {
           tag: "div",
           properties: {
             innerHTML:
-              "This will export all Zotero items with their notes and annotations to your XMnote application.",
+              hasPreSelected && dialogData.exportScope === "selected"
+                ? `This will export ${preSelectedItems!.length} selected items with their notes and annotations to your XMnote application.`
+                : "This will export all Zotero items with their notes and annotations to your XMnote application.",
           },
           styles: {
             marginTop: "15px",
@@ -152,7 +237,8 @@ export class ExportDialog {
             backgroundColor: "#f0f0f0",
             borderRadius: "4px",
             fontSize: "12px",
-            color: "#666"
+            color: "#666",
+            gridColumn: "1 / -1,
           },
         })
         .addButton("Export", "export", {
@@ -187,19 +273,39 @@ export class ExportDialog {
                 progress: 10,
               });
 
-              // 获取所有条目
-              const allItems = await Zotero.Items.getAll(
-                Zotero.Libraries.userLibraryID,
-              );
-              logger.info(`Found ${allItems.length} items to export`);
+              // 根据导出范围获取条目
+              let targetItems: any[];
+              let itemCount: number;
+
+              if (dialogData.exportScope === "selected" && hasPreSelected) {
+                // 使用预选条目
+                const selectedIds = preSelectedItems!.map((item) => item.id);
+                targetItems = await Promise.all(
+                  selectedIds.map((id) => Zotero.Items.getAsync(id))
+                );
+                itemCount = targetItems.length;
+                logger.info(`Using ${itemCount} pre-selected items for export`);
+              } else {
+                // 获取所有条目
+                targetItems = await Zotero.Items.getAll(
+                  Zotero.Libraries.userLibraryID
+                );
+                itemCount = targetItems.length;
+                logger.info(`Found ${itemCount} items to export`);
+              }
 
               progressWin.changeLine({
-                text: `Processing ${allItems.length} items...`,
+                text: `Processing ${itemCount} items...`,
                 progress: 20,
               });
 
               // 使用完整的导出流程
-              const exportOptions = {
+              const exportOptions: SelectiveExportOptions = {
+                exportScope: dialogData.exportScope,
+                selectedItems:
+                  dialogData.exportScope === "selected" && hasPreSelected
+                    ? preSelectedItems!.map((item) => item.id)
+                    : undefined,
                 includeNotes: dialogData.includeNotes,
                 includeAnnotations: dialogData.includeAnnotations,
                 includeMetadata: dialogData.includeMetadata,
@@ -256,6 +362,182 @@ export class ExportDialog {
     } catch (error) {
       logger.error("Failed to show export dialog:", error);
       throw error;
+    }
+  }
+
+  // 快速导出选中的条目（用于右键菜单）
+  static async quickExport(selectedItems: ZoteroItemInfo[]): Promise<void> {
+    try {
+      logger.info(`Starting quick export for ${selectedItems.length} items`);
+
+      // 显示进度窗口
+      const progressWin = new ztoolkit.ProgressWindow("XMnote Quick Export", {
+        closeOnClick: false,
+        closeTime: -1
+      });
+
+      progressWin
+        .createLine({
+          text: "Initializing export...",
+          type: "default",
+          progress: 0
+        })
+        .show();
+
+      try {
+        // 获取导出器
+        const { getDataExporter } = await import("../exporter");
+        const exporter = getDataExporter();
+
+        progressWin.changeLine({
+          text: `Processing ${selectedItems.length} selected items...`,
+          progress: 20
+        });
+
+        // 使用默认导出设置
+        const exportOptions: SelectiveExportOptions = {
+          exportScope: "selected",
+          selectedItems: selectedItems.map((item) => item.id),
+          includeNotes: true,
+          includeAnnotations: true,
+          includeMetadata: true,
+          batchSize: 10,
+          onProgress: (progress: any) => {
+            const progressPercent =
+              progress.total > 0
+                ? 20 + (progress.current / progress.total) * 60
+                : 20;
+
+            progressWin.changeLine({
+              text: `${progress.message} (${progress.current}/${progress.total})`,
+              progress: progressPercent
+            });
+          }
+        };
+
+        const result = await exporter.export(exportOptions);
+
+        // 显示结果
+        progressWin.changeLine({
+          text: result.summary,
+          type: result.success ? "success" : "fail",
+          progress: 100
+        });
+
+        // 3秒后自动关闭
+        setTimeout(() => {
+          progressWin.close();
+        }, 3000);
+
+        logger.info(`Quick export completed: ${result.summary}`);
+      } catch (error) {
+        logger.error("Quick export failed:", error);
+        progressWin.changeLine({
+          text: `Export failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+          type: "fail",
+          progress: 100
+        });
+
+        setTimeout(() => {
+          progressWin.close();
+        }, 5000);
+      }
+    } catch (error) {
+      logger.error("Failed to start quick export:", error);
+      throw error;
+    }
+  }
+
+  // 从当前选中的Zotero条目创建条目信息
+  static async createSelectedItemsInfo(): Promise<ZoteroItemInfo[]> {
+    try {
+      const selectedItems = ztoolkit.getGlobal("ZoteroPane").getSelectedItems();
+      if (!selectedItems || selectedItems.length === 0) {
+        return [];
+      }
+
+      const itemsInfo: ZoteroItemInfo[] = [];
+      for (const item of selectedItems) {
+        if (!item.isRegularItem() || item.deleted) {
+          continue;
+        }
+
+        try {
+          const itemInfo: ZoteroItemInfo = {
+            id: item.id,
+            title: item.getField("title") || "Untitled",
+            itemType: item.itemType,
+            creators: this.formatCreators(item),
+            date: item.getField("date") || undefined,
+            collections: this.getItemCollections(item),
+            tags: this.getItemTags(item)
+          };
+
+          itemsInfo.push(itemInfo);
+        } catch (error) {
+          logger.warn(`Failed to process selected item ${item.id}:`, error);
+        }
+      }
+
+      return itemsInfo;
+    } catch (error) {
+      logger.error("Failed to create selected items info:", error);
+      return [];
+    }
+  }
+
+  // 辅助方法：格式化创作者信息
+  static formatCreators(item: Zotero.Item): string {
+    try {
+      const creators = item.getCreators();
+      if (!creators || creators.length === 0) {
+        return "Unknown";
+      }
+
+      return (
+        creators
+          .slice(0, 3)
+          .map((creator: any) => {
+            if (creator.lastName && creator.firstName) {
+              return `${creator.lastName}, ${creator.firstName}`;
+            } else if (creator.lastName) {
+              return creator.lastName;
+            } else if (creator.name) {
+              return creator.name;
+            } else {
+              return "Unknown";
+            }
+          })
+          .join("; ") + (creators.length > 3 ? " et al." : "")
+      );
+    } catch (error) {
+      logger.warn(`Failed to format creators for item ${item.id}:`, error);
+      return "Unknown";
+    }
+  }
+
+  // 辅助方法：获取条目的分类信息
+  static getItemCollections(item: Zotero.Item): string[] {
+    try {
+      const collections = item.getCollections();
+      return collections.map((collectionID: number) => {
+        const collection = Zotero.Collections.get(collectionID);
+        return collection ? collection.name : `Collection ${collectionID}`;
+      });
+    } catch (error) {
+      logger.warn(`Failed to get collections for item ${item.id}:`, error);
+      return [];
+    }
+  }
+
+  // 辅助方法：获取条目的标签信息
+  static getItemTags(item: Zotero.Item): string[] {
+    try {
+      const tags = item.getTags();
+      return tags.map((tag: any) => tag.tag || tag.name || "").filter(Boolean);
+    } catch (error) {
+      logger.warn(`Failed to get tags for item ${item.id}:`, error);
+      return [];
     }
   }
 
