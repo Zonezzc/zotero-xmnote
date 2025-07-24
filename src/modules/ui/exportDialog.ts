@@ -1,7 +1,11 @@
 // 导出对话框
 
 import { logger } from "../../utils/logger";
-import type { ExportOptions, ExportProgress, SelectiveExportOptions } from "../exporter";
+import type {
+  ExportOptions,
+  ExportProgress,
+  SelectiveExportOptions,
+} from "../exporter";
 import { getDataExporter } from "../exporter";
 import { type ZoteroItemInfo } from "./itemSelector";
 
@@ -59,21 +63,21 @@ export class ExportDialog {
             fontSize: "14px",
             fontWeight: "bold",
             marginBottom: "10px",
-            marginTop: "15px"
+            marginTop: "15px",
           },
         })
         .addCell(2, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
-            for: "scope-all-radio"
+            for: "scope-all-radio",
           },
           properties: { innerHTML: "All Items" },
           styles: {
             display: "block",
             marginBottom: "5px",
-            fontWeight: "normal"
-          }
+            fontWeight: "normal",
+          },
         })
         .addCell(
           2,
@@ -87,28 +91,28 @@ export class ExportDialog {
               "data-prop": "checked",
               type: "radio",
               name: "exportScope",
-              value: "all"
-            }
+              value: "all",
+            },
           },
-          false
+          false,
         )
         .addCell(3, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
-            for: "scope-selected-radio"
+            for: "scope-selected-radio",
           },
           properties: {
             innerHTML: hasPreSelected
               ? `Selected Items (${preSelectedItems!.length})`
-              : "Selected Items"
+              : "Selected Items",
           },
           styles: {
             display: "block",
             marginBottom: "5px",
             fontWeight: "normal",
-            color: hasPreSelected ? "#333" : "#999"
-          }
+            color: hasPreSelected ? "#333" : "#999",
+          },
         })
         .addCell(
           3,
@@ -123,10 +127,10 @@ export class ExportDialog {
               type: "radio",
               name: "exportScope",
               value: "selected",
-              disabled: hasPreSelected ? undefined : "true"
-            }
+              disabled: hasPreSelected ? undefined : "true",
+            },
           },
-          false
+          false,
         )
         .addCell(4, 0, {
           tag: "h2",
@@ -135,20 +139,20 @@ export class ExportDialog {
             fontSize: "14px",
             fontWeight: "bold",
             marginBottom: "10px",
-            maginTop: "15px"
-          }
+            marginTop: "15px",
+          },
         })
         .addCell(5, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
-            for: "include-notes-checkbox"
+            for: "include-notes-checkbox",
           },
           properties: { innerHTML: "Include Notes" },
           styles: {
             display: "block",
             marginBottom: "5px",
-            fontWeight: "normal"
+            fontWeight: "normal",
           },
         })
         .addCell(
@@ -161,22 +165,22 @@ export class ExportDialog {
             attributes: {
               "data-bind": "includeNotes",
               "data-prop": "checked",
-              type: "checkbox"
+              type: "checkbox",
             },
           },
-          false
+          false,
         )
         .addCell(6, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
-            for: "include-annotations-checkbox"
+            for: "include-annotations-checkbox",
           },
           properties: { innerHTML: "Include Annotations" },
           styles: {
             display: "block",
             marginBottom: "5px",
-            fontWeight: "normal"
+            fontWeight: "normal",
           },
         })
         .addCell(
@@ -189,22 +193,22 @@ export class ExportDialog {
             attributes: {
               "data-bind": "includeAnnotations",
               "data-prop": "checked",
-              type: "checkbox"
+              type: "checkbox",
             },
           },
-          false
+          false,
         )
         .addCell(7, 0, {
           tag: "label",
           namespace: "html",
           attributes: {
-            for: "include-metadata-checkbox"
+            for: "include-metadata-checkbox",
           },
           properties: { innerHTML: "Include Metadata" },
           styles: {
             display: "block",
             marginBottom: "5px",
-            fontWeight: "normal"
+            fontWeight: "normal",
           },
         })
         .addCell(
@@ -217,10 +221,10 @@ export class ExportDialog {
             attributes: {
               "data-bind": "includeMetadata",
               "data-prop": "checked",
-              type: "checkbox"
+              type: "checkbox",
             },
           },
-          false
+          false,
         )
         .addCell(8, 0, {
           tag: "div",
@@ -238,7 +242,7 @@ export class ExportDialog {
             borderRadius: "4px",
             fontSize: "12px",
             color: "#666",
-            gridColumn: "1 / -1,
+            gridColumn: "1 / -1",
           },
         })
         .addButton("Export", "export", {
@@ -281,14 +285,14 @@ export class ExportDialog {
                 // 使用预选条目
                 const selectedIds = preSelectedItems!.map((item) => item.id);
                 targetItems = await Promise.all(
-                  selectedIds.map((id) => Zotero.Items.getAsync(id))
+                  selectedIds.map((id) => Zotero.Items.getAsync(id)),
                 );
                 itemCount = targetItems.length;
                 logger.info(`Using ${itemCount} pre-selected items for export`);
               } else {
                 // 获取所有条目
                 targetItems = await Zotero.Items.getAll(
-                  Zotero.Libraries.userLibraryID
+                  Zotero.Libraries.userLibraryID,
                 );
                 itemCount = targetItems.length;
                 logger.info(`Found ${itemCount} items to export`);
@@ -373,14 +377,14 @@ export class ExportDialog {
       // 显示进度窗口
       const progressWin = new ztoolkit.ProgressWindow("XMnote Quick Export", {
         closeOnClick: false,
-        closeTime: -1
+        closeTime: -1,
       });
 
       progressWin
         .createLine({
           text: "Initializing export...",
           type: "default",
-          progress: 0
+          progress: 0,
         })
         .show();
 
@@ -391,7 +395,7 @@ export class ExportDialog {
 
         progressWin.changeLine({
           text: `Processing ${selectedItems.length} selected items...`,
-          progress: 20
+          progress: 20,
         });
 
         // 使用默认导出设置
@@ -410,9 +414,9 @@ export class ExportDialog {
 
             progressWin.changeLine({
               text: `${progress.message} (${progress.current}/${progress.total})`,
-              progress: progressPercent
+              progress: progressPercent,
             });
-          }
+          },
         };
 
         const result = await exporter.export(exportOptions);
@@ -421,7 +425,7 @@ export class ExportDialog {
         progressWin.changeLine({
           text: result.summary,
           type: result.success ? "success" : "fail",
-          progress: 100
+          progress: 100,
         });
 
         // 3秒后自动关闭
@@ -435,7 +439,7 @@ export class ExportDialog {
         progressWin.changeLine({
           text: `Export failed: ${error instanceof Error ? error.message : "Unknown error"}`,
           type: "fail",
-          progress: 100
+          progress: 100,
         });
 
         setTimeout(() => {
@@ -470,7 +474,7 @@ export class ExportDialog {
             creators: this.formatCreators(item),
             date: item.getField("date") || undefined,
             collections: this.getItemCollections(item),
-            tags: this.getItemTags(item)
+            tags: this.getItemTags(item),
           };
 
           itemsInfo.push(itemInfo);
