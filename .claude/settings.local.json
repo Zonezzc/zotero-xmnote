@@ -7,7 +7,9 @@
       "Bash(mkdir:*)",
       "Bash(pnpm:*)",
       "Bash(npm:*)",
-      "WebFetch(domain:*)"
+      "WebFetch(domain:*)",
+      "Bash(find:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
