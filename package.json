@@ -1,10 +1,10 @@
 {
   "name": "zotero-xmnote",
   "type": "module",
-  "version": "0.0.0",
-  "description": "Zotero Xmnode Plugin",
+  "version": "1.0.0",
+  "description": "Zotero Xmnote Plugin",
   "config": {
-    "addonName": "Zotero Xmnode Plugin",
+    "addonName": "Zotero Xmnote Plugin",
     "addonID": "zonezzc@foxmail.com",
     "addonRef": "zonezzc",
     "addonInstance": "zonezzc",
