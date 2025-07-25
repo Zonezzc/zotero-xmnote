@@ -1,131 +1,129 @@
 <linkset>
-  <html:link rel="localization" href="__addonRef__-preferences.ftl" />
+    <html:link rel="localization" href="__addonRef__-preferences.ftl" />
 </linkset>
 <groupbox
-  onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window });"
+onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window });"
 >
 <label>
-  <html:h2>XMnote Configuration</html:h2>
+    <html:h2>XMnote Configuration</html:h2>
 </label>
 
 <!-- XMnote 服务器配置 -->
 <groupbox>
-  <label>
-    <html:h3>Server Settings</html:h3>
-  </label>
+    <label>
+        <html:h3>Server Settings</html:h3>
+    </label>
 
-  <hbox align="center">
-    <html:label for="xmnote-server-ip">IP Address:</html:label>
-    <html:input
-            type="text"
-            id="xmnote-server-ip"
-            placeholder="192.168.1.100"
-            style="margin-left: 10px; width: 150px"
-    />
-  </hbox>
+    <hbox align="center">
+        <html:label for="xmnote-server-ip">IP Address:</html:label>
+        <html:input
+                type="text"
+                id="xmnote-server-ip"
+                placeholder="192.168.1.100"
+                style="margin-left: 10px; width: 150px"
+        />
+    </hbox>
 
-  <hbox align="center" style="margin-top: 8px">
-    <html:label for="xmnote-server-port">Port:</html:label>
-    <html:input
-            type="number"
-            id="xmnote-server-port"
-            placeholder="8080"
-            min="1"
-            max="65535"
-            style="margin-left: 10px; width: 100px"
-    />
-  </hbox>
+    <hbox align="center" style="margin-top: 8px">
+        <html:label for="xmnote-server-port">Port:</html:label>
+        <html:input
+                type="number"
+                id="xmnote-server-port"
+                placeholder="8080"
+                min="1"
+                max="65535"
+                style="margin-left: 10px; width: 100px"
+        />
+    </hbox>
 
-  <hbox align="center" style="margin-top: 8px">
-    <html:label for="xmnote-server-timeout">Timeout (ms):</html:label>
-    <html:input
-            type="number"
-            id="xmnote-server-timeout"
-            placeholder="30000"
-            min="1000"
-            max="300000"
-            style="margin-left: 10px; width: 100px"
-    />
-  </hbox>
+    <hbox align="center" style="margin-top: 8px">
+        <html:label for="xmnote-server-timeout">Timeout (ms):</html:label>
+        <html:input
+                type="number"
+                id="xmnote-server-timeout"
+                placeholder="30000"
+                min="1000"
+                max="300000"
+                style="margin-left: 10px; width: 100px"
+        />
+    </hbox>
 
-  <hbox align="center" style="margin-top: 12px">
-    <button id="xmnote-test-connection">Test Connection</button>
-    <html:span
-            id="xmnote-connection-status"
-            style="font-weight: bold; margin-left: 10px"
-    ></html:span>
-  </hbox>
+    <hbox align="center" style="margin-top: 12px">
+        <button id="xmnote-test-connection">Test Connection</button>
+        <html:span
+                id="xmnote-connection-status"
+                style="font-weight: bold; margin-left: 10px"
+        ></html:span>
+    </hbox>
 </groupbox>
 
 <!-- 导入选项配置 -->
 <groupbox style="margin-top: 12px">
-  <label>
-    <html:h3>Import Options</html:h3>
-  </label>
+    <label>
+        <html:h3>Import Options</html:h3>
+    </label>
 
-  <vbox>
-    <checkbox
-            id="xmnote-include-notes"
-            label="Include Notes"
-            checked="true"
-    />
+    <vbox>
+        <checkbox
+                id="xmnote-include-notes"
+                label="Include Notes"
+                checked="true"
+        />
 
-    <checkbox
-            id="xmnote-include-annotations"
-            label="Include Annotations"
-            style="margin-top: 4px"
-            checked="true"
-    />
+        <checkbox
+                id="xmnote-include-annotations"
+                label="Include Annotations"
+                style="margin-top: 4px"
+                checked="true"
+        />
 
-    <checkbox
-            id="xmnote-include-metadata"
-            label="Include Metadata"
-            style="margin-top: 4px"
-            checked="true"
-    />
-  </vbox>
+        <checkbox
+                id="xmnote-include-metadata"
+                label="Include Metadata"
+                style="margin-top: 4px"
+                checked="true"
+        />
+    </vbox>
 
-  <hbox align="center" style="margin-top: 12px">
-    <html:label for="xmnote-batch-size">Batch Size:</html:label>
-    <html:input
-            type="number"
-            id="xmnote-batch-size"
-            placeholder="10"
-            min="1"
-            max="100"
-            style="margin-left: 10px; width: 80px"
-    />
-  </hbox>
+    <hbox align="center" style="margin-top: 12px">
+        <html:label for="xmnote-batch-size">Batch Size:</html:label>
+        <html:input
+                type="number"
+                id="xmnote-batch-size"
+                placeholder="10"
+                min="1"
+                max="100"
+                style="margin-left: 10px; width: 80px"
+        />
+    </hbox>
 
-  <hbox align="center" style="margin-top: 8px">
-    <html:label for="xmnote-retry-count">Retry Count:</html:label>
-    <html:input
-            type="number"
-            id="xmnote-retry-count"
-            placeholder="3"
-            min="0"
-            max="10"
-            style="margin-left: 10px; width: 80px"
-    />
-  </hbox>
+    <hbox align="center" style="margin-top: 8px">
+        <html:label for="xmnote-retry-count">Retry Count:</html:label>
+        <html:input
+                type="number"
+                id="xmnote-retry-count"
+                placeholder="3"
+                min="0"
+                max="10"
+                style="margin-left: 10px; width: 80px"
+        />
+    </hbox>
 </groupbox>
 
 <!-- 操作按钮 -->
 <hbox style="margin-top: 16px">
-  <button
-          id="xmnote-reset-defaults"
-          style="margin-right: 10px"
-  >Reset Defaults
-  </button>
+    <button id="xmnote-reset-defaults" style="margin-right: 10px">
+        Reset Defaults
+    </button>
 
-  <button id="xmnote-save-config">Save Configuration</button>
+    <button id="xmnote-save-config">Save Configuration</button>
 </hbox>
 
 <!-- 状态信息 -->
 <vbox style="margin-top: 12px">
-  <html:div
-          id="xmnote-config-status"
-          style="padding: 8px; border-radius: 4px; display: none"
-  ></html:div>
+    <html:div
+            id="xmnote-config-status"
+            style="padding: 8px; border-radius: 4px; display: none"
+    ></html:div>
 </vbox>
 </groupbox>

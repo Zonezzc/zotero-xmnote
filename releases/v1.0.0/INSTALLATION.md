@@ -76,6 +76,7 @@
     - 选择 `XMnote` 标签页
 
 2. **填写连接信息**
+
    ```
    API 地址: http://your-xmnote-server.com/api
    API 密钥: your-api-key (如果需要)

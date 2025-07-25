@@ -117,7 +117,7 @@ Export completed successfully!   [▓▓▓▓▓▓▓▓▓▓] 100%
 ```
 检查清单：
 □ API 地址格式正确
-□ 网络连接正常  
+□ 网络连接正常
 □ XMnote 服务运行中
 □ 防火墙允许访问
 ```

@@ -134,7 +134,7 @@ Collection右键菜单:
 
 ```typescript
 interface SelectiveExportOptions extends ExportOptions {
-  exportScope: 'all' | 'selected' | 'custom';
+  exportScope: "all" | "selected" | "custom";
   selectedItemIds?: number[];
   searchQuery?: string;
   filters?: {
@@ -165,42 +165,42 @@ class ItemSelector {
   private selectedItems: Set<number> = new Set();
   private filters: FilterState = {};
 
-  async loadItems(query?: string, filters?: FilterState): Promise<ZoteroItem[]>
+  async loadItems(query?: string, filters?: FilterState): Promise<ZoteroItem[]>;
 
-  selectItem(itemId: number): void
+  selectItem(itemId: number): void;
 
-  deselectItem(itemId: number): void
+  deselectItem(itemId: number): void;
 
-  getSelectedItems(): ZoteroItem[]
+  getSelectedItems(): ZoteroItem[];
 
-  applyFilters(filters: FilterState): void
+  applyFilters(filters: FilterState): void;
 
-  search(query: string): void
+  search(query: string): void;
 }
 
 // 增强的导出对话框
 class SelectiveExportDialog extends ExportDialog {
   private itemSelector: ItemSelector;
-  private exportScope: 'all' | 'selected' | 'custom' = 'all';
+  private exportScope: "all" | "selected" | "custom" = "all";
 
-  static async showForItems(preSelectedItems?: ZoteroItem[]): Promise<void>
+  static async showForItems(preSelectedItems?: ZoteroItem[]): Promise<void>;
 
-  private async setupItemSelector(): Promise<void>
+  private async setupItemSelector(): Promise<void>;
 
-  private handleScopeChange(scope: string): void
+  private handleScopeChange(scope: string): void;
 
-  private async updatePreview(): Promise<void>
+  private async updatePreview(): Promise<void>;
 }
 
 // 右键菜单处理器
 class ContextMenuHandler {
-  static registerItemContextMenu(): void
+  static registerItemContextMenu(): void;
 
-  static registerCollectionContextMenu(): void
+  static registerCollectionContextMenu(): void;
 
-  static async handleQuickExport(items: ZoteroItem[]): Promise<void>
+  static async handleQuickExport(items: ZoteroItem[]): Promise<void>;
 
-  static async handleExportWithOptions(items: ZoteroItem[]): Promise<void>
+  static async handleExportWithOptions(items: ZoteroItem[]): Promise<void>;
 }
 ```
 
@@ -251,7 +251,7 @@ class ContextMenuHandler {
 
 ```typescript
 interface SelectiveExportConfig {
-  defaultExportScope: 'all' | 'selected' | 'custom';
+   defaultExportScope: "all" | "selected" | "custom";
   rememberLastSelection: boolean;
   enableQuickExport: boolean;
   defaultFilters: FilterState;

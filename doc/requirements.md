@@ -175,18 +175,15 @@
   🎮 用户使用方式
 
   方式1：工具菜单
-
   - 点击 "Tools" → "Export to XMnote"
   - 可以选择导出范围（全部或预选条目）
 
   方式2：右键菜单（新增）
-
   - 在条目上右键 → "Quick Export to XMnote" （快速导出）
   - 在条目上右键 → "Export to XMnote..." （打开对话框）
   - 在分类上右键 → "Export Collection to XMnote..."
 
   方式3：预选条目
-
   - 先选中想要导出的条目
   - 通过任何方式打开导出对话框
   - 自动检测并默认选择"Selected Items"

@@ -43,16 +43,6 @@ async function onStartup() {
     logger.error("Failed to register XMnote menus:", error);
   }
 
-  // Example functions disabled for plugin development
-  // BasicExampleFactory.registerPrefs();
-  // BasicExampleFactory.registerNotifier();
-  // KeyExampleFactory.registerShortcuts();
-  // await UIExampleFactory.registerExtraColumn();
-  // await UIExampleFactory.registerExtraColumnWithCustomCell();
-  // UIExampleFactory.registerItemPaneCustomInfoRow();
-  // UIExampleFactory.registerItemPaneSection();
-  // UIExampleFactory.registerReaderItemPaneSection();
-
   await Promise.all(
     Zotero.getMainWindows().map((win) => onMainWindowLoad(win)),
   );
@@ -87,15 +77,6 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
     text: `[30%] ${getString("startup-begin")}`,
   });
 
-  // Example UI functions disabled for plugin development
-  // UIExampleFactory.registerStyleSheet(win);
-  // UIExampleFactory.registerRightClickMenuItem();
-  // UIExampleFactory.registerRightClickMenuPopup(win);
-  // UIExampleFactory.registerWindowMenuWithSeparator();
-  // PromptExampleFactory.registerNormalCommandExample();
-  // PromptExampleFactory.registerAnonymousCommandExample(win);
-  // PromptExampleFactory.registerConditionalCommandExample();
-
   await Zotero.Promise.delay(1000);
 
   popupWin.changeLine({
@@ -103,9 +84,6 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
     text: `[100%] ${getString("startup-finish")}`,
   });
   popupWin.startCloseTimer(5000);
-
-  // Example dialog event disabled for plugin development
-  // addon.hooks.onDialogEvents("dialogExample");
 }
 
 async function onMainWindowUnload(win: Window): Promise<void> {
@@ -161,16 +139,6 @@ async function onNotify(
 ) {
   // You can add your code to the corresponding notify type
   ztoolkit.log("notify", event, type, ids, extraData);
-  // Example notifier callback disabled for plugin development
-  // if (
-  //   event == "select" &&
-  //   type == "tab" &&
-  //   extraData[ids[0]].type == "reader"
-  // ) {
-  //   BasicExampleFactory.exampleNotifierCallback();
-  // } else {
-  //   return;
-  // }
 }
 
 /**
@@ -182,7 +150,6 @@ async function onNotify(
 async function onPrefsEvent(type: string, data: { [key: string]: any }) {
   switch (type) {
     case "load":
-      // registerPrefsScripts(data.window); // 示例首选项脚本已禁用
       registerXMnotePrefsScripts(data.window);
       break;
     default:
@@ -191,40 +158,11 @@ async function onPrefsEvent(type: string, data: { [key: string]: any }) {
 }
 
 function onShortcuts(type: string) {
-  // Example shortcuts disabled for plugin development
-  // switch (type) {
-  //   case "larger":
-  //     KeyExampleFactory.exampleShortcutLargerCallback();
-  //     break;
-  //   case "smaller":
-  //     KeyExampleFactory.exampleShortcutSmallerCallback();
-  //     break;
-  //   default:
-  //     break;
-  // }
+  // TODO: Add shortcut handlers as needed
 }
 
 function onDialogEvents(type: string) {
-  // Example dialog events disabled for plugin development
-  // switch (type) {
-  //   case "dialogExample":
-  //     HelperExampleFactory.dialogExample();
-  //     break;
-  //   case "clipboardExample":
-  //     HelperExampleFactory.clipboardExample();
-  //     break;
-  //   case "filePickerExample":
-  //     HelperExampleFactory.filePickerExample();
-  //     break;
-  //   case "progressWindowExample":
-  //     HelperExampleFactory.progressWindowExample();
-  //     break;
-  //   case "vtableExample":
-  //     HelperExampleFactory.vtableExample();
-  //     break;
-  //   default:
-  //     break;
-  // }
+  // TODO: Add dialog event handlers as needed
 }
 
 // 注册XMnote首选项面板
