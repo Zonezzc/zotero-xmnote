@@ -35,7 +35,7 @@
 
 - **直接链接**: [下载 v1.0.0](https://github.com/Zonezzc/zotero-xmnote/releases/download/v1.0.0/zotero-xmnote-plugin.xpi)
 - **文件大小**: 54KB
-- **SHA256**: `f45931620bc3b3b73611c339ffd3c4f8dc541c0182583b89e6ad1dfc5d18d126`
+- **SHA256**: `e947bfc1bdec19cd545124a982c984efa4ef735242da8f34b5af3b16a9d73f22`
 
 ## ⚙️ 配置设置
 
