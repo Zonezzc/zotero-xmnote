@@ -33,7 +33,9 @@
 - Languages: English, Chinese (Simplified)
 
 ## Download
-- **Plugin File**: [zotero-xmnote-plugin.xpi](./zotero-xmnote-plugin.xpi)
+
+- **Plugin File**: Download `zotero-xmnote-plugin.xpi`
+  from [GitHub Releases](https://github.com/Zonezzc/zotero-xmnote/releases/tag/v1.0.0)
 - **File Size**: 54KB
 - **SHA256**: `f45931620bc3b3b73611c339ffd3c4f8dc541c0182583b89e6ad1dfc5d18d126`
 

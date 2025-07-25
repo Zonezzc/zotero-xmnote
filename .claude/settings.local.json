@@ -16,7 +16,11 @@
       "Bash(git push:*)",
       "Bash(gh release create:*)",
       "Bash(shasum:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh release delete:*)",
+      "Bash(gh release view:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
