@@ -27,7 +27,7 @@
 - **Context Menu**: Right-click on collections or items for quick export options
 
 ## Technical Details
-- Plugin ID: `zonezzc@foxmail.com`
+- Plugin ID: `zotero-xmnote`
 - Version: 1.0.0
 - Compatible with: Zotero 7 and later
 - Languages: English, Chinese (Simplified)

@@ -107,7 +107,7 @@
 
 ### 插件信息
 
-- **插件 ID**: `zonezzc@foxmail.com`
+- **插件 ID**: `zotero-xmnote`
 - **版本**: 1.0.0
 - **许可证**: AGPL-3.0-or-later
 - **架构**: 事件驱动、模块化设计

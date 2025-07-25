@@ -5,7 +5,7 @@
   "description": "Zotero Xmnote Plugin",
   "config": {
     "addonName": "Zotero Xmnote Plugin",
-    "addonID": "zonezzc@foxmail.com",
+    "addonID": "zotero-xmnote",
     "addonRef": "zonezzc",
     "addonInstance": "zonezzc",
     "prefsPrefix": "extensions.zotero.${addonRef}"

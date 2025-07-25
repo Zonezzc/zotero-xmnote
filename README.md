@@ -107,7 +107,7 @@ A powerful Zotero plugin that seamlessly integrates with XMnote server for effic
 
 ### Plugin Information
 
-- **Plugin ID**: `zonezzc@foxmail.com`
+- **Plugin ID**: `zotero-xmnote`
 - **Version**: 1.0.0
 - **License**: AGPL-3.0-or-later
 - **Architecture**: Event-driven, modular design
