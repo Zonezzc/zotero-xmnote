@@ -76,6 +76,17 @@ export class XMnoteApiClientImpl implements XMnoteApiClient {
         configManager.getImportOptions().retryCount,
       );
 
+      // 检查响应数据中的错误信息
+      if (response.data && response.data.code && response.data.code !== 200) {
+        logger.error(`XMnote server error for note ${note.title}:`, response.data);
+        return {
+          success: false,
+          statusCode: response.data.code,
+          message: response.data.message || "XMnote server error",
+          data: response.data,
+        };
+      }
+
       logger.info(`Note imported successfully: ${note.title}`);
       return {
         success: true,

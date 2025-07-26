@@ -173,6 +173,19 @@ export class DataTransformerImpl implements DataTransformer {
     if (!xmnoteNote.currentPage && xmnoteNote.totalPageCount) {
       xmnoteNote.currentPage = 1;
     }
+    
+    // 如果还是没有totalPageCount，尝试从currentPage推断或设置默认值
+    if (!xmnoteNote.totalPageCount) {
+      if (xmnoteNote.currentPage && xmnoteNote.currentPage > 0) {
+        // 如果有currentPage，推断totalPageCount至少等于currentPage
+        xmnoteNote.totalPageCount = Math.max(xmnoteNote.currentPage, 100); // 默认假设至少100页
+        logger.info(`No PDF page count found, estimated totalPageCount: ${xmnoteNote.totalPageCount} based on currentPage: ${xmnoteNote.currentPage}`);
+      } else {
+        // 如果都没有，设置一个合理的默认值
+        xmnoteNote.totalPageCount = 200; // 默认200页
+        logger.info(`No PDF page count or annotations found, using default totalPageCount: ${xmnoteNote.totalPageCount}`);
+      }
+    }
   }
 
   // 转换元数据
