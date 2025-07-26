@@ -33,6 +33,7 @@ export class ConfigManager {
         includeNotes: true,
         includeAnnotations: true,
         includeMetadata: true,
+        includeCurrentPage: true, // 默认包含当前页数（智能检测）
         batchSize: 10,
         retryCount: 3,
         timeoutMs: 30000,
@@ -86,6 +87,10 @@ export class ConfigManager {
             (Zotero.Prefs.get(
               `${prefPrefix}.xmnote.import.includeMetadata`,
             ) as boolean) ?? defaultConfig.importOptions.includeMetadata,
+          includeCurrentPage:
+            (Zotero.Prefs.get(
+              `${prefPrefix}.xmnote.import.includeCurrentPage`,
+            ) as boolean) ?? defaultConfig.importOptions.includeCurrentPage,
           batchSize:
             (Zotero.Prefs.get(
               `${prefPrefix}.xmnote.import.batchSize`,
@@ -151,6 +156,10 @@ export class ConfigManager {
       Zotero.Prefs.set(
         `${prefPrefix}.xmnote.import.includeMetadata`,
         config.importOptions.includeMetadata,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.import.includeCurrentPage`,
+        config.importOptions.includeCurrentPage,
       );
       Zotero.Prefs.set(
         `${prefPrefix}.xmnote.import.batchSize`,

@@ -68,7 +68,7 @@ export class XMnoteApiClientImpl implements XMnoteApiClient {
       
       // 详细记录发送的参数
       logger.info(`Sending to XMnote API - Title: ${note.title}`);
-      logger.info(`Full request data:`, JSON.stringify(note, null, 2));
+      // logger.info(`Full request data:`, JSON.stringify(note, null, 2));
 
       const url = this.getApiUrl();
       const response = await withRetry(
@@ -77,6 +77,8 @@ export class XMnoteApiClientImpl implements XMnoteApiClient {
       );
 
       // 检查响应数据中的错误信息
+      logger.debug(`Checking response for note ${note.title}:`, response.data);
+      
       if (response.data && response.data.code && response.data.code !== 200) {
         logger.error(`XMnote server error for note ${note.title}:`, response.data);
         return {

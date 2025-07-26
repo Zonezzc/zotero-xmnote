@@ -10,6 +10,7 @@ export interface ImportOptions {
   includeNotes: boolean;
   includeAnnotations: boolean;
   includeMetadata: boolean;
+  includeCurrentPage: boolean;
   batchSize: number;
   retryCount: number;
   timeoutMs: number;

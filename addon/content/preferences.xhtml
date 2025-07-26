@@ -83,6 +83,16 @@ onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window });"
                 style="margin-top: 4px"
                 checked="true"
         />
+
+        <checkbox
+                id="xmnote-include-current-page"
+                label="Include Current Page (Smart Detection)"
+                style="margin-top: 4px"
+                checked="true"
+        />
+        <html:div style="margin-left: 20px; margin-top: 2px; font-size: 11px; color: #666;">
+            ✅ Auto-skips items without totalPageCount to prevent import failures
+        </html:div>
     </vbox>
 
     <hbox align="center" style="margin-top: 12px">

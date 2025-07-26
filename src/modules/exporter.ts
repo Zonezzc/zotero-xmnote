@@ -389,6 +389,23 @@ export class DataExporter {
       parts.push(`Imported ${importResult.success} successfully`);
       if (importResult.failed > 0) {
         parts.push(`${importResult.failed} failed`);
+        
+        // 添加详细的错误信息
+        const failedResults = importResult.results.filter(r => !r.success);
+        if (failedResults.length > 0) {
+          const errorMessages = failedResults.map(r => r.message).filter(msg => msg);
+          if (errorMessages.length > 0) {
+            // 获取第一个错误信息作为主要错误展示
+            const primaryError = errorMessages[0];
+            parts.push(`Error: ${primaryError}`);
+            
+            // 如果有多个不同的错误，显示错误种类数
+            const uniqueErrors = [...new Set(errorMessages)];
+            if (uniqueErrors.length > 1) {
+              parts.push(`(${uniqueErrors.length} different error types)`);
+            }
+          }
+        }
       }
     }
 

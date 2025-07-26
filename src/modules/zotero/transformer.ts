@@ -150,33 +150,52 @@ export class DataTransformerImpl implements DataTransformer {
       }
     }
 
-    // 获取已有笔记或书摘的最大页数作为当前页数
-    if (annotations.length > 0) {
-      let maxPage = 0;
+    // 根据配置决定是否包含当前页数
+    const config = configManager.getImportOptions();
+    if (config.includeCurrentPage) {
+      logger.debug(`Including current page as per configuration`);
       
-      for (const annotation of annotations) {
-        if (annotation.pageLabel) {
-          const pageNum = this.extractPageNumber(annotation.pageLabel);
-          if (pageNum && pageNum > maxPage) {
-            maxPage = pageNum;
+      // 检查是否有totalPageCount
+      if (xmnoteNote.totalPageCount && xmnoteNote.totalPageCount > 0) {
+        logger.debug(`totalPageCount available (${xmnoteNote.totalPageCount}), proceeding with currentPage calculation`);
+        
+        // 获取已有笔记或书摘的最大页数作为当前页数
+        if (annotations.length > 0) {
+          let maxPage = 0;
+          
+          for (const annotation of annotations) {
+            if (annotation.pageLabel) {
+              const pageNum = this.extractPageNumber(annotation.pageLabel);
+              if (pageNum && pageNum > maxPage) {
+                maxPage = pageNum;
+              }
+            }
+          }
+          
+          if (maxPage > 0) {
+            xmnoteNote.currentPage = maxPage;
+            logger.debug(`Found max annotation page: ${maxPage} for item: ${item.title}`);
           }
         }
-      }
-      
-      if (maxPage > 0) {
-        xmnoteNote.currentPage = maxPage;
-        logger.debug(`Found max annotation page: ${maxPage} for item: ${item.title}`);
-      }
-    }
 
-    // 如果没有找到注释页数，但有总页数，则设置当前页数为1
-    if (!xmnoteNote.currentPage && xmnoteNote.totalPageCount) {
-      xmnoteNote.currentPage = 1;
-    }
-    
-    // 如果还是没有totalPageCount，记录问题但不设置默认值
-    if (!xmnoteNote.totalPageCount) {
-      logger.warn(`No PDF page count found for item: ${item.title}. This may cause XMnote import to fail.`);
+        // 如果没有找到注释页数，但有总页数，则设置当前页数为1
+        if (!xmnoteNote.currentPage && xmnoteNote.totalPageCount) {
+          xmnoteNote.currentPage = 1;
+          logger.debug(`Set current page to 1 as default for item: ${item.title}`);
+        }
+      } else {
+        // 没有totalPageCount，清除currentPage和totalPageCount字段
+        logger.warn(`No totalPageCount found for item: ${item.title}, removing both currentPage and totalPageCount fields to avoid import failure`);
+        delete xmnoteNote.currentPage;
+        delete xmnoteNote.totalPageCount;
+      }
+    } else {
+      logger.debug(`Skipping current page as per configuration`);
+      
+      // 如果不包含当前页数，但仍然没有totalPageCount，记录警告
+      if (!xmnoteNote.totalPageCount) {
+        logger.warn(`No PDF page count found for item: ${item.title}. This may cause XMnote import to fail.`);
+      }
     }
   }
 

@@ -36,6 +36,7 @@ function initializePrefsUI(window: Window) {
     "xmnote-include-notes",
     "xmnote-include-annotations",
     "xmnote-include-metadata",
+    "xmnote-include-current-page",
     "xmnote-batch-size",
     "xmnote-retry-count",
     "xmnote-show-progress",
@@ -127,6 +128,11 @@ function loadCurrentConfig(window: Window) {
       doc,
       "xmnote-include-metadata",
       config.importOptions.includeMetadata,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-include-current-page",
+      config.importOptions.includeCurrentPage,
     );
     setInputValue(
       doc,
@@ -291,6 +297,7 @@ function getConfigFromUI(window: Window): PluginConfig | null {
       includeNotes: getCheckboxValue(doc, "xmnote-include-notes"),
       includeAnnotations: getCheckboxValue(doc, "xmnote-include-annotations"),
       includeMetadata: getCheckboxValue(doc, "xmnote-include-metadata"),
+      includeCurrentPage: getCheckboxValue(doc, "xmnote-include-current-page"),
       batchSize: parseInt(getInputValue(doc, "xmnote-batch-size") || "10"),
       retryCount: parseInt(getInputValue(doc, "xmnote-retry-count") || "3"),
       timeoutMs: xmnoteServer.timeout || 30000,
