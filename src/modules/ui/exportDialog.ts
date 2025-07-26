@@ -277,11 +277,17 @@ export class ExportDialog {
                 progress: 10,
               });
 
+              // 检查实际选中的导出范围（而不是依赖 dialogData）
+              const selectedRadio = dialogHelper.window?.document.querySelector('input[name="exportScope"]:checked') as HTMLInputElement;
+              const actualExportScope = selectedRadio?.value || dialogData.exportScope;
+              
+              logger.info(`Dialog exportScope: ${dialogData.exportScope}, Actual selected: ${actualExportScope}, hasPreSelected: ${hasPreSelected}`);
+
               // 根据导出范围获取条目
               let targetItems: any[];
               let itemCount: number;
 
-              if (dialogData.exportScope === "selected" && hasPreSelected) {
+              if (actualExportScope === "selected" && hasPreSelected) {
                 // 使用预选条目
                 const selectedIds = preSelectedItems!.map((item) => item.id);
                 targetItems = await Promise.all(
@@ -305,9 +311,9 @@ export class ExportDialog {
 
               // 使用完整的导出流程
               const exportOptions: SelectiveExportOptions = {
-                exportScope: dialogData.exportScope,
+                exportScope: actualExportScope as "all" | "selected" | "custom",
                 selectedItems:
-                  dialogData.exportScope === "selected" && hasPreSelected
+                  actualExportScope === "selected" && hasPreSelected
                     ? preSelectedItems!.map((item) => item.id)
                     : undefined,
                 includeNotes: dialogData.includeNotes,
@@ -327,6 +333,7 @@ export class ExportDialog {
                 },
               };
 
+              logger.info(`Export options:`, exportOptions);
               const result = await exporter.export(exportOptions);
 
               // 显示结果

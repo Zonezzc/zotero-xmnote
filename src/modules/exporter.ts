@@ -30,7 +30,7 @@ export interface ExportOptions {
 
 export interface SelectiveExportOptions extends ExportOptions {
   exportScope: "all" | "selected" | "custom";
-  selectedItemIds?: number[];
+  selectedItems?: number[];
   searchQuery?: string;
   filters?: {
     itemTypes?: string[];
