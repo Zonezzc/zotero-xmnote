@@ -29,6 +29,9 @@ export class DataTransformerImpl implements DataTransformer {
       locationUnit: this.determineLocationUnit(item),
     };
 
+    // 添加PDF页数信息
+    this.addPdfPageInfo(item, annotations, xmnoteNote);
+
     // 元数据转换
     this.transformMetadata(item, xmnoteNote);
 
@@ -115,6 +118,48 @@ export class DataTransformerImpl implements DataTransformer {
     } else {
       // 电子书使用位置
       return 1;
+    }
+  }
+
+  // 添加PDF页数信息
+  private addPdfPageInfo(
+    item: ZoteroItem,
+    annotations: ZoteroAnnotation[],
+    xmnoteNote: XMnoteNote,
+  ): void {
+    // 获取PDF附件的总页数
+    if (item.attachments) {
+      for (const attachment of item.attachments) {
+        if (attachment.contentType === "application/pdf" && attachment.numPages) {
+          xmnoteNote.totalPageCount = attachment.numPages;
+          logger.debug(`Found PDF with ${attachment.numPages} pages for item: ${item.title}`);
+          break; // 使用第一个找到的PDF页数
+        }
+      }
+    }
+
+    // 获取已有笔记或书摘的最大页数作为当前页数
+    if (annotations.length > 0) {
+      let maxPage = 0;
+      
+      for (const annotation of annotations) {
+        if (annotation.pageLabel) {
+          const pageNum = this.extractPageNumber(annotation.pageLabel);
+          if (pageNum && pageNum > maxPage) {
+            maxPage = pageNum;
+          }
+        }
+      }
+      
+      if (maxPage > 0) {
+        xmnoteNote.currentPage = maxPage;
+        logger.debug(`Found max annotation page: ${maxPage} for item: ${item.title}`);
+      }
+    }
+
+    // 如果没有找到注释页数，但有总页数，则设置当前页数为1
+    if (!xmnoteNote.currentPage && xmnoteNote.totalPageCount) {
+      xmnoteNote.currentPage = 1;
     }
   }
 

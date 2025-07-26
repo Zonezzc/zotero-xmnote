@@ -2,4 +2,7 @@
 /* prettier-ignore */
 /* eslint-disable */
 // @ts-nocheck
-export type FluentMessageId = "pref-help" | "startup-begin" | "startup-finish";
+export type FluentMessageId =
+  | 'pref-help'
+  | 'startup-begin'
+  | 'startup-finish';

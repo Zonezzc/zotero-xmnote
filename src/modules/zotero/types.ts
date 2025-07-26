@@ -13,6 +13,16 @@ export interface ZoteroItem {
   collections: string[];
   dateAdded?: Date;
   dateModified?: Date;
+  attachments?: ZoteroAttachment[];
+}
+
+export interface ZoteroAttachment {
+  id: number;
+  parentItemID: number;
+  title: string;
+  contentType: string;
+  filename?: string;
+  numPages?: number;
 }
 
 export interface ZoteroCreator {

@@ -152,6 +152,7 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
         ISBN: item.getField("ISBN") || undefined,
         tags: this.extractTags(item),
         collections: this.extractCollections(item),
+        attachments: this.extractAttachments(item),
         dateAdded: item.dateAdded ? new Date(item.dateAdded) : undefined,
         dateModified: item.dateModified
           ? new Date(item.dateModified)
@@ -203,6 +204,53 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
       });
     } catch (error) {
       logger.error("Failed to extract collections:", error);
+      return [];
+    }
+  }
+
+  // 提取附件
+  private extractAttachments(item: any): import("./types").ZoteroAttachment[] {
+    try {
+      const attachments = item.getAttachments();
+      const result: import("./types").ZoteroAttachment[] = [];
+      
+      for (const attachmentId of attachments) {
+        try {
+          const attachment = Zotero.Items.get(attachmentId);
+          if (attachment && attachment.isAttachment()) {
+            const attachmentData: import("./types").ZoteroAttachment = {
+              id: attachment.id,
+              parentItemID: attachment.parentItemID || 0,
+              title: attachment.getField("title") || "",
+              contentType: attachment.attachmentContentType || "",
+              filename: attachment.attachmentFilename || undefined,
+            };
+            
+            // 获取PDF页数
+            if (attachment.attachmentContentType === "application/pdf") {
+              try {
+                // 尝试通过不同方式获取PDF页数
+                const numPages = (attachment as any).attachmentNumPages || 
+                                (attachment as any).numPages;
+                if (numPages && typeof numPages === 'number' && numPages > 0) {
+                  attachmentData.numPages = numPages;
+                  logger.debug(`Found PDF attachment with ${numPages} pages`);
+                }
+              } catch (error) {
+                logger.debug("Could not get PDF page count:", error);
+              }
+            }
+            
+            result.push(attachmentData);
+          }
+        } catch (error) {
+          logger.error(`Failed to extract attachment ${attachmentId}:`, error);
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      logger.error("Failed to extract attachments:", error);
       return [];
     }
   }
