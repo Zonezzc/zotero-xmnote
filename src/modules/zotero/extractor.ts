@@ -211,50 +211,95 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
   // 提取附件
   private extractAttachments(item: any): import("./types").ZoteroAttachment[] {
     try {
-      const attachments = item.getAttachments();
       const result: import("./types").ZoteroAttachment[] = [];
       
-      logger.info(`Extracting ${attachments.length} attachments for item: ${item.getField("title")}`);
+      // 使用正确的Zotero API获取附件
+      const attachmentIDs = item.getAttachments();
+      logger.info(`Found ${attachmentIDs.length} attachments for item: ${item.getField("title")}`);
       
-      for (const attachmentId of attachments) {
+      for (const attachmentID of attachmentIDs) {
         try {
-          const attachment = Zotero.Items.get(attachmentId);
+          const attachment = Zotero.Items.get(attachmentID);
           if (attachment && attachment.isAttachment()) {
             const attachmentData: import("./types").ZoteroAttachment = {
               id: attachment.id,
               parentItemID: attachment.parentItemID || 0,
-              title: attachment.getField("title") || "",
+              title: attachment.getField("title") || attachment.attachmentFilename || "",
               contentType: attachment.attachmentContentType || "",
               filename: attachment.attachmentFilename || undefined,
             };
             
-            logger.info(`Processing attachment: ${attachmentData.title}, type: ${attachmentData.contentType}`);
+            logger.info(`Processing attachment: ${attachmentData.title}, type: ${attachmentData.contentType}, filename: ${attachmentData.filename}`);
             
-            // 获取PDF页数
+            // 专门处理PDF附件的页数
             if (attachment.attachmentContentType === "application/pdf") {
               try {
-                // 尝试多种方式获取PDF页数
-                let numPages = (attachment as any).attachmentNumPages || 
-                              (attachment as any).numPages ||
-                              (attachment as any).getField?.("numPages");
-                              
-                logger.info(`PDF page count attempts - attachmentNumPages: ${(attachment as any).attachmentNumPages}, numPages: ${(attachment as any).numPages}, getField: ${(attachment as any).getField?.("numPages")}`);
+                let numPages: number | undefined;
                 
-                if (numPages && typeof numPages === 'number' && numPages > 0) {
+                // 方法1: 尝试获取PDF文件的实际页数（如果Zotero已经索引了）
+                if (attachment.isPDFAttachment && attachment.isPDFAttachment()) {
+                  // 尝试通过Zotero内部方法获取页数
+                  numPages = (attachment as any).numPages;
+                  if (!numPages) {
+                    numPages = (attachment as any).getField("numPages");
+                  }
+                  
+                  logger.info(`PDF attachment page count from Zotero: ${numPages}`);
+                }
+                
+                // 方法2: 如果没有，尝试通过文件属性获取
+                if (!numPages) {
+                  try {
+                    const file = (attachment as any).getFile?.();
+                    if (file && file.exists && file.exists()) {
+                      logger.info(`PDF file path: ${file.path}`);
+                      // 注意：这里可能需要PDF解析库，暂时记录文件信息
+                    }
+                  } catch (fileError) {
+                    logger.debug("Could not access PDF file:", fileError);
+                  }
+                }
+                
+                // 方法3: 检查附件的其他属性
+                const allProps = Object.getOwnPropertyNames(attachment);
+                const pageRelatedProps = allProps.filter(prop => 
+                  prop.toLowerCase().includes('page') || 
+                  prop.toLowerCase().includes('num') ||
+                  prop.toLowerCase().includes('count')
+                );
+                logger.info(`PDF attachment page-related properties: ${pageRelatedProps.join(', ')}`);
+                
+                // 记录所有可能包含页数的属性值
+                for (const prop of pageRelatedProps) {
+                  try {
+                    const value = (attachment as any)[prop];
+                    logger.info(`${prop}: ${value} (type: ${typeof value})`);
+                    
+                    if (!numPages && value && typeof value === 'number' && value > 0) {
+                      numPages = value;
+                      logger.info(`Found page count from property ${prop}: ${numPages}`);
+                    }
+                  } catch (e) {
+                    // 忽略无法访问的属性
+                  }
+                }
+                
+                if (numPages && numPages > 0) {
                   attachmentData.numPages = numPages;
                   logger.info(`Successfully found PDF attachment with ${numPages} pages`);
                 } else {
-                  logger.info(`PDF attachment found but no valid page count: ${attachmentData.title}`);
+                  logger.warn(`PDF attachment found but no page count available: ${attachmentData.title}`);
                 }
+                
               } catch (error) {
-                logger.warn("Could not get PDF page count:", error);
+                logger.error("Error processing PDF attachment:", error);
               }
             }
             
             result.push(attachmentData);
           }
         } catch (error) {
-          logger.error(`Failed to extract attachment ${attachmentId}:`, error);
+          logger.error(`Failed to process attachment ${attachmentID}:`, error);
         }
       }
       

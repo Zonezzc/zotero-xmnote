@@ -20,7 +20,9 @@
       "Bash(gh auth:*)",
       "Bash(gh release delete:*)",
       "Bash(gh release view:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "WebFetch(domain:www.zotero.org)",
+      "WebFetch(domain:forums.zotero.org)"
     ],
     "deny": []
   }
