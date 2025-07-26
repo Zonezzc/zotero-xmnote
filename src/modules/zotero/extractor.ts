@@ -214,6 +214,8 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
       const attachments = item.getAttachments();
       const result: import("./types").ZoteroAttachment[] = [];
       
+      logger.info(`Extracting ${attachments.length} attachments for item: ${item.getField("title")}`);
+      
       for (const attachmentId of attachments) {
         try {
           const attachment = Zotero.Items.get(attachmentId);
@@ -226,18 +228,26 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
               filename: attachment.attachmentFilename || undefined,
             };
             
+            logger.info(`Processing attachment: ${attachmentData.title}, type: ${attachmentData.contentType}`);
+            
             // 获取PDF页数
             if (attachment.attachmentContentType === "application/pdf") {
               try {
-                // 尝试通过不同方式获取PDF页数
-                const numPages = (attachment as any).attachmentNumPages || 
-                                (attachment as any).numPages;
+                // 尝试多种方式获取PDF页数
+                let numPages = (attachment as any).attachmentNumPages || 
+                              (attachment as any).numPages ||
+                              (attachment as any).getField?.("numPages");
+                              
+                logger.info(`PDF page count attempts - attachmentNumPages: ${(attachment as any).attachmentNumPages}, numPages: ${(attachment as any).numPages}, getField: ${(attachment as any).getField?.("numPages")}`);
+                
                 if (numPages && typeof numPages === 'number' && numPages > 0) {
                   attachmentData.numPages = numPages;
-                  logger.debug(`Found PDF attachment with ${numPages} pages`);
+                  logger.info(`Successfully found PDF attachment with ${numPages} pages`);
+                } else {
+                  logger.info(`PDF attachment found but no valid page count: ${attachmentData.title}`);
                 }
               } catch (error) {
-                logger.debug("Could not get PDF page count:", error);
+                logger.warn("Could not get PDF page count:", error);
               }
             }
             
@@ -248,6 +258,7 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
         }
       }
       
+      logger.info(`Successfully extracted ${result.length} attachments`);
       return result;
     } catch (error) {
       logger.error("Failed to extract attachments:", error);

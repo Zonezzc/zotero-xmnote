@@ -128,12 +128,24 @@ export class DataTransformerImpl implements DataTransformer {
     xmnoteNote: XMnoteNote,
   ): void {
     // 获取PDF附件的总页数
-    if (item.attachments) {
+    logger.info(`Checking attachments for item: ${item.title}`);
+    
+    if (!item.attachments) {
+      logger.info(`No attachments found for item: ${item.title}`);
+    } else {
+      logger.info(`Found ${item.attachments.length} attachments for item: ${item.title}`);
+      
       for (const attachment of item.attachments) {
-        if (attachment.contentType === "application/pdf" && attachment.numPages) {
-          xmnoteNote.totalPageCount = attachment.numPages;
-          logger.debug(`Found PDF with ${attachment.numPages} pages for item: ${item.title}`);
-          break; // 使用第一个找到的PDF页数
+        logger.info(`Attachment: ${attachment.title}, contentType: ${attachment.contentType}, numPages: ${attachment.numPages}`);
+        
+        if (attachment.contentType === "application/pdf") {
+          if (attachment.numPages) {
+            xmnoteNote.totalPageCount = attachment.numPages;
+            logger.info(`Found PDF with ${attachment.numPages} pages for item: ${item.title}`);
+            break; // 使用第一个找到的PDF页数
+          } else {
+            logger.info(`PDF attachment found but no page count available: ${attachment.title}`);
+          }
         }
       }
     }

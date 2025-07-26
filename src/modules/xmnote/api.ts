@@ -65,6 +65,10 @@ export class XMnoteApiClientImpl implements XMnoteApiClient {
   async importNote(note: XMnoteNote): Promise<ImportResult> {
     try {
       logger.debug("Importing note:", note.title);
+      
+      // 详细记录发送的参数
+      logger.info(`Sending to XMnote API - Title: ${note.title}`);
+      logger.info(`Full request data:`, JSON.stringify(note, null, 2));
 
       const url = this.getApiUrl();
       const response = await withRetry(
