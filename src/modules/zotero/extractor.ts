@@ -213,9 +213,43 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
     try {
       const result: import("./types").ZoteroAttachment[] = [];
       
+      logger.info(`Starting attachment extraction for item: ${item.getField("title")} (ID: ${item.id})`);
+      
+      // 首先检查项目是否是常规项目
+      logger.info(`Item type: ${item.itemType}, isRegularItem: ${item.isRegularItem()}`);
+      
       // 使用正确的Zotero API获取附件
-      const attachmentIDs = item.getAttachments();
-      logger.info(`Found ${attachmentIDs.length} attachments for item: ${item.getField("title")}`);
+      let attachmentIDs: number[] = [];
+      try {
+        attachmentIDs = item.getAttachments();
+        logger.info(`getAttachments() returned: ${JSON.stringify(attachmentIDs)} (length: ${attachmentIDs.length})`);
+      } catch (error) {
+        logger.error("getAttachments() failed:", error);
+      }
+      
+      // 如果没有附件，尝试其他方法
+      if (attachmentIDs.length === 0) {
+        logger.info("No attachments found via getAttachments(), trying alternative methods...");
+        
+        // 方法2: 尝试通过子项目查找
+        try {
+          const zoteroItem = Zotero.Items.get(item.id);
+          if (zoteroItem) {
+            const childItems = (zoteroItem as any).getChildItems?.() || [];
+            logger.info(`Found ${childItems.length} child items`);
+            
+            for (const child of childItems) {
+              logger.info(`Child item ${child.id}: type=${child.itemType}, isAttachment=${child.isAttachment()}`);
+              if (child.isAttachment()) {
+                attachmentIDs.push(child.id);
+              }
+            }
+            logger.info(`Found ${attachmentIDs.length} attachments via child items`);
+          }
+        } catch (error) {
+          logger.error("Failed to get child items:", error);
+        }
+      }
       
       for (const attachmentID of attachmentIDs) {
         try {
