@@ -22,7 +22,8 @@
       "Bash(gh release view:*)",
       "Bash(git commit:*)",
       "WebFetch(domain:www.zotero.org)",
-      "WebFetch(domain:forums.zotero.org)"
+      "WebFetch(domain:forums.zotero.org)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

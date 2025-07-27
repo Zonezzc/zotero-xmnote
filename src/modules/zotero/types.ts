@@ -14,6 +14,7 @@ export interface ZoteroItem {
   dateAdded?: Date;
   dateModified?: Date;
   attachments?: ZoteroAttachment[];
+  numPages?: number;
 }
 
 export interface ZoteroAttachment {
@@ -70,6 +71,7 @@ export interface ZoteroMetadata {
   itemType: string;
   tags: ZoteroTag[];
   collections: string[];
+  numPages?: number;
 }
 
 export interface ZoteroDataExtractor {

@@ -32,6 +32,9 @@ export class DataTransformerImpl implements DataTransformer {
     // 添加PDF页数信息
     this.addPdfPageInfo(item, annotations, xmnoteNote);
 
+    // 根据配置决定是否包含当前页数
+    this.setCurrentPage(item, annotations, xmnoteNote);
+
     // 元数据转换
     this.transformMetadata(item, xmnoteNote);
 
@@ -94,17 +97,41 @@ export class DataTransformerImpl implements DataTransformer {
 
   // 确定书籍类型
   private determineBookType(item: ZoteroItem): 0 | 1 {
+    logger.info(`Determining book type for item: ${item.title}, itemType: ${item.itemType}`);
+    
+    // 优先检查是否有PDF附件，有PDF则认为是电子书
+    if (item.attachments && item.attachments.length > 0) {
+      logger.info(`Found ${item.attachments.length} attachments for item: ${item.title}`);
+      const hasPdf = item.attachments.some(
+        (attachment) => {
+          logger.info(`Attachment: ${attachment.title}, contentType: ${attachment.contentType}`);
+          return attachment.contentType === "application/pdf";
+        },
+      );
+      if (hasPdf) {
+        logger.info(`Found PDF attachment, identifying as ebook (type: 1) for item: ${item.title}`);
+        return 1; // 有PDF附件，识别为电子书
+      } else {
+        logger.info(`No PDF attachments found for item: ${item.title}`);
+      }
+    } else {
+      logger.info(`No attachments found for item: ${item.title}`);
+    }
+
     // 根据Zotero条目类型判断
     const physicalTypes = ["book", "bookSection", "manuscript"];
     const digitalTypes = ["computerProgram", "webpage", "blogPost"];
 
     if (physicalTypes.includes(item.itemType)) {
+      logger.info(`ItemType '${item.itemType}' is physical type, identifying as physical book (type: 0) for item: ${item.title}`);
       return 0; // 纸质书
     } else if (digitalTypes.includes(item.itemType)) {
+      logger.info(`ItemType '${item.itemType}' is digital type, identifying as ebook (type: 1) for item: ${item.title}`);
       return 1; // 电子书
     }
 
     // 默认为电子书
+    logger.info(`ItemType '${item.itemType}' not recognized, defaulting to ebook (type: 1) for item: ${item.title}`);
     return 1;
   }
 
@@ -127,42 +154,105 @@ export class DataTransformerImpl implements DataTransformer {
     annotations: ZoteroAnnotation[],
     xmnoteNote: XMnoteNote,
   ): void {
-    // 获取PDF附件的总页数
-    logger.info(`Checking attachments for item: ${item.title}`);
-    
-    if (!item.attachments) {
-      logger.info(`No attachments found for item: ${item.title}`);
-    } else {
-      logger.info(`Found ${item.attachments.length} attachments for item: ${item.title}`);
-      
-      for (const attachment of item.attachments) {
-        logger.info(`Attachment: ${attachment.title}, contentType: ${attachment.contentType}, numPages: ${attachment.numPages}`);
-        
-        if (attachment.contentType === "application/pdf") {
-          if (attachment.numPages) {
-            xmnoteNote.totalPageCount = attachment.numPages;
-            logger.info(`Found PDF with ${attachment.numPages} pages for item: ${item.title}`);
-            break; // 使用第一个找到的PDF页数
+    // 优先从Zotero主条目字段获取页数信息
+    logger.info(`Checking page count for item: ${item.title}`);
+
+    // 1. 检查Zotero条目本身的页数字段
+    const pageFields = [
+      "numPages", // 页数
+      "pages", // 页码范围
+      "totalPages", // 总页数
+      "numberOfPages", // 页数（某些条目类型）
+    ];
+
+    for (const field of pageFields) {
+      const fieldValue = (item as any)[field];
+      if (fieldValue) {
+        let pageCount: number | null = null;
+
+        if (typeof fieldValue === "number") {
+          pageCount = fieldValue;
+        } else if (typeof fieldValue === "string") {
+          // 处理页码范围格式，如 "1-233", "pp. 1-233" 等
+          const pageMatch = fieldValue.match(/(\d+)[-–](\d+)/);
+          if (pageMatch) {
+            const startPage = parseInt(pageMatch[1], 10);
+            const endPage = parseInt(pageMatch[2], 10);
+            pageCount = endPage - startPage + 1;
           } else {
-            logger.info(`PDF attachment found but no page count available: ${attachment.title}`);
+            // 尝试提取单个数字
+            const numberMatch = fieldValue.match(/\d+/);
+            if (numberMatch) {
+              pageCount = parseInt(numberMatch[0], 10);
+            }
           }
+        }
+
+        if (pageCount && pageCount > 0) {
+          xmnoteNote.totalPageCount = pageCount;
+          logger.info(
+            `Found page count from field '${field}': ${pageCount} for item: ${item.title}`,
+          );
+          break; // 找到后跳出循环，但继续执行currentPage逻辑
         }
       }
     }
 
-    // 根据配置决定是否包含当前页数
+    // 2. 如果主条目字段没有页数信息，再检查PDF附件
+    if (!xmnoteNote.totalPageCount) {
+      logger.info(
+        `No page count in item fields, checking attachments for item: ${item.title}`,
+      );
+
+      if (!item.attachments) {
+        logger.info(`No attachments found for item: ${item.title}`);
+      } else {
+        logger.info(
+          `Found ${item.attachments.length} attachments for item: ${item.title}`,
+        );
+
+        for (const attachment of item.attachments) {
+          logger.info(
+            `Attachment: ${attachment.title}, contentType: ${attachment.contentType}, numPages: ${attachment.numPages}`,
+          );
+
+          if (attachment.contentType === "application/pdf") {
+            if (attachment.numPages) {
+              xmnoteNote.totalPageCount = attachment.numPages;
+              logger.info(
+                `Found PDF with ${attachment.numPages} pages for item: ${item.title}`,
+              );
+              break; // 使用第一个找到的PDF页数，但继续执行currentPage逻辑
+            } else {
+              logger.info(
+                `PDF attachment found but no page count available: ${attachment.title}`,
+              );
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 设置当前页数
+  private setCurrentPage(
+    item: ZoteroItem,
+    annotations: ZoteroAnnotation[],
+    xmnoteNote: XMnoteNote,
+  ): void {
     const config = configManager.getImportOptions();
     if (config.includeCurrentPage) {
-      logger.debug(`Including current page as per configuration`);
-      
+      logger.info(`Including current page as per configuration`);
+
       // 检查是否有totalPageCount
       if (xmnoteNote.totalPageCount && xmnoteNote.totalPageCount > 0) {
-        logger.debug(`totalPageCount available (${xmnoteNote.totalPageCount}), proceeding with currentPage calculation`);
-        
+        logger.info(
+          `totalPageCount available (${xmnoteNote.totalPageCount}), proceeding with currentPage calculation`,
+        );
+
         // 获取已有笔记或书摘的最大页数作为当前页数
+        let maxPage = 0;
         if (annotations.length > 0) {
-          let maxPage = 0;
-          
           for (const annotation of annotations) {
             if (annotation.pageLabel) {
               const pageNum = this.extractPageNumber(annotation.pageLabel);
@@ -171,30 +261,37 @@ export class DataTransformerImpl implements DataTransformer {
               }
             }
           }
-          
-          if (maxPage > 0) {
-            xmnoteNote.currentPage = maxPage;
-            logger.debug(`Found max annotation page: ${maxPage} for item: ${item.title}`);
-          }
         }
 
-        // 如果没有找到注释页数，但有总页数，则设置当前页数为1
-        if (!xmnoteNote.currentPage && xmnoteNote.totalPageCount) {
+        // 设置currentPage：有笔记则用最大页数，没有笔记则默认为1
+        if (maxPage > 0) {
+          xmnoteNote.currentPage = maxPage;
+          logger.info(
+            `Found max annotation page: ${maxPage} for item: ${item.title}`,
+          );
+        } else {
           xmnoteNote.currentPage = 1;
-          logger.debug(`Set current page to 1 as default for item: ${item.title}`);
+          logger.info(
+            `No annotations found, set currentPage to 1 as default for item: ${item.title}`,
+          );
         }
       } else {
         // 没有totalPageCount，清除currentPage和totalPageCount字段
-        logger.warn(`No totalPageCount found for item: ${item.title}, removing both currentPage and totalPageCount fields to avoid import failure`);
+        logger.warn(
+          `No totalPageCount found for item: ${item.title}, removing both currentPage and totalPageCount fields to avoid import failure`,
+        );
         delete xmnoteNote.currentPage;
         delete xmnoteNote.totalPageCount;
       }
     } else {
-      logger.debug(`Skipping current page as per configuration`);
-      
-      // 如果不包含当前页数，但仍然没有totalPageCount，记录警告
-      if (!xmnoteNote.totalPageCount) {
-        logger.warn(`No PDF page count found for item: ${item.title}. This may cause XMnote import to fail.`);
+      logger.info(`Skipping current page as per configuration`);
+
+      // 不包含currentPage时，删除totalPageCount以确保成对出现
+      if (xmnoteNote.totalPageCount) {
+        logger.info(
+          `Removing totalPageCount since currentPage is not included for item: ${item.title}`,
+        );
+        delete xmnoteNote.totalPageCount;
       }
     }
   }
@@ -283,8 +380,8 @@ export class DataTransformerImpl implements DataTransformer {
     // 来源
     xmnoteNote.source = "Zotero";
 
-    // 默认阅读状态为"想读"
-    xmnoteNote.readingStatus = 1;
+    // 默认阅读状态为"在读"
+    xmnoteNote.readingStatus = 2;
 
     if (item.dateAdded) {
       xmnoteNote.readingStatusChangedDate = Math.floor(

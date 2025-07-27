@@ -217,24 +217,20 @@ export class DataExporter {
     let items: ZoteroItem[];
 
     if (options.selectedItems && options.selectedItems.length > 0) {
-      // 处理指定的条目
+      // 处理指定的条目 - 使用完整的提取方法包含附件信息
       items = [];
       for (const itemId of options.selectedItems) {
         try {
-          const metadata = this.extractor.getItemMetadata(itemId);
-          const item: ZoteroItem = {
-            id: metadata.itemID,
-            title: metadata.title,
-            itemType: metadata.itemType,
-            creators: metadata.creators,
-            abstractNote: metadata.abstractNote,
-            publisher: metadata.publisher,
-            date: metadata.date,
-            ISBN: metadata.ISBN,
-            tags: metadata.tags,
-            collections: metadata.collections,
-          };
-          items.push(item);
+          // 获取Zotero原始项目对象
+          const zoteroItem = Zotero.Items.get(itemId);
+          if (zoteroItem && zoteroItem.isRegularItem() && !zoteroItem.deleted) {
+            // 使用完整的extractItem方法来获取包含附件的完整数据
+            const extractedItem = (this.extractor as any).extractItem(zoteroItem);
+            if (extractedItem) {
+              items.push(extractedItem);
+              logger.info(`[EXTRACT FIX] Extracted item with ${extractedItem.attachments?.length || 0} attachments: ${extractedItem.title}`);
+            }
+          }
         } catch (error) {
           logger.warn(`Failed to extract item ${itemId}:`, error);
         }
@@ -389,16 +385,18 @@ export class DataExporter {
       parts.push(`Imported ${importResult.success} successfully`);
       if (importResult.failed > 0) {
         parts.push(`${importResult.failed} failed`);
-        
+
         // 添加详细的错误信息
-        const failedResults = importResult.results.filter(r => !r.success);
+        const failedResults = importResult.results.filter((r) => !r.success);
         if (failedResults.length > 0) {
-          const errorMessages = failedResults.map(r => r.message).filter(msg => msg);
+          const errorMessages = failedResults
+            .map((r) => r.message)
+            .filter((msg) => msg);
           if (errorMessages.length > 0) {
             // 获取第一个错误信息作为主要错误展示
             const primaryError = errorMessages[0];
             parts.push(`Error: ${primaryError}`);
-            
+
             // 如果有多个不同的错误，显示错误种类数
             const uniqueErrors = [...new Set(errorMessages)];
             if (uniqueErrors.length > 1) {

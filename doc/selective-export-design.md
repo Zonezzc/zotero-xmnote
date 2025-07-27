@@ -71,20 +71,20 @@
 #### 核心组件
 
 1. **ExportScopeSelector**: 导出范围选择器
-    - All Items: 导出所有条目
-    - Selected Items: 导出预选条目（如果有的话）
-    - Custom Selection: 自定义选择
+   - All Items: 导出所有条目
+   - Selected Items: 导出预选条目（如果有的话）
+   - Custom Selection: 自定义选择
 
 2. **ItemSelector**: 条目选择器
-    - 搜索框：支持标题、作者、关键词搜索
-    - 筛选器：按类型、分类、标签、日期筛选
-    - 双列表选择：左侧可选，右侧已选
-    - 批量操作：全选、清空、移除
+   - 搜索框：支持标题、作者、关键词搜索
+   - 筛选器：按类型、分类、标签、日期筛选
+   - 双列表选择：左侧可选，右侧已选
+   - 批量操作：全选、清空、移除
 
 3. **ItemPreview**: 条目预览
-    - 显示选中条目数量
-    - 预估导出的笔记和注释数量
-    - 显示预计导出数据大小
+   - 显示选中条目数量
+   - 预估导出的笔记和注释数量
+   - 显示预计导出数据大小
 
 ### 方案2：右键快速导出
 
@@ -251,7 +251,7 @@ class ContextMenuHandler {
 
 ```typescript
 interface SelectiveExportConfig {
-   defaultExportScope: "all" | "selected" | "custom";
+  defaultExportScope: "all" | "selected" | "custom";
   rememberLastSelection: boolean;
   enableQuickExport: boolean;
   defaultFilters: FilterState;

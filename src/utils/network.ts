@@ -87,16 +87,19 @@ export class NetworkClient {
               } catch {
                 responseData = xhr.responseText;
               }
-              
+
               logger.info(`HTTP ${xhr.status} Response:`, responseData);
-              
+
               resolve({
                 status: xhr.status,
                 data: responseData,
                 headers: this.parseHeaders(xhr.getAllResponseHeaders()),
               });
             } else {
-              logger.error(`HTTP ${xhr.status} Error Response:`, xhr.responseText);
+              logger.error(
+                `HTTP ${xhr.status} Error Response:`,
+                xhr.responseText,
+              );
               reject(
                 new NetworkError(
                   `HTTP ${xhr.status}: ${xhr.statusText}`,

@@ -47,21 +47,21 @@ A powerful Zotero plugin that seamlessly integrates with XMnote server for effic
 
 ### Server Settings
 
-| Setting | Description | Default | Range |
-|---------|-------------|---------|-------|
-| **IP Address** | XMnote server IP address | `192.168.1.100` | Valid IP |
-| **Port** | XMnote server port | `8080` | 1-65535 |
-| **Timeout (ms)** | Connection timeout in milliseconds | `30000` | 1000-300000 |
+| Setting          | Description                        | Default         | Range       |
+| ---------------- | ---------------------------------- | --------------- | ----------- |
+| **IP Address**   | XMnote server IP address           | `192.168.1.100` | Valid IP    |
+| **Port**         | XMnote server port                 | `8080`          | 1-65535     |
+| **Timeout (ms)** | Connection timeout in milliseconds | `30000`         | 1000-300000 |
 
 ### Import Options
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| **Include Notes** | Export item notes | ✅ Enabled |
+| Option                  | Description            | Default    |
+| ----------------------- | ---------------------- | ---------- |
+| **Include Notes**       | Export item notes      | ✅ Enabled |
 | **Include Annotations** | Export PDF annotations | ✅ Enabled |
-| **Include Metadata** | Export item metadata | ✅ Enabled |
-| **Batch Size** | Items per batch | `10` |
-| **Retry Count** | Failed request retries | `3` |
+| **Include Metadata**    | Export item metadata   | ✅ Enabled |
+| **Batch Size**          | Items per batch        | `10`       |
+| **Retry Count**         | Failed request retries | `3`        |
 
 ### Connection Testing
 
@@ -88,11 +88,13 @@ A powerful Zotero plugin that seamlessly integrates with XMnote server for effic
 ### Context Menu Actions
 
 **For Collections:**
+
 1. Right-click on any collection in the library panel
 2. Select **Export to XMnote** from the context menu
 3. All items in the collection will be exported
 
 **For Items:**
+
 1. Right-click on any item(s) in the center panel
 2. Select **Export to XMnote** from the context menu
 3. Selected item(s) will be exported
@@ -115,6 +117,7 @@ A powerful Zotero plugin that seamlessly integrates with XMnote server for effic
 ### Data Format
 
 The plugin exports Zotero items in a structured format that includes:
+
 - **Bibliographic metadata** (title, authors, publication details)
 - **Item notes** (if enabled)
 - **PDF annotations** (if enabled and available)

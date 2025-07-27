@@ -36,10 +36,12 @@
 ## 配置说明
 
 ### 默认设置
+
 - **默认状态**: ✅ 已启用
 - **推荐设置**: 保持启用状态
 
 ### 配置位置
+
 1. 打开Zotero → **编辑** → **首选项**
 2. 点击 **XMnote** 标签页
 3. 在"Import Options"部分找到：
@@ -74,6 +76,7 @@
 ## 日志信息解读
 
 ### 正常处理日志
+
 ```
 [DEBUG] Including current page as per configuration
 [DEBUG] totalPageCount available (233), proceeding with currentPage calculation
@@ -81,11 +84,13 @@
 ```
 
 ### 智能跳过日志
+
 ```
 [WARN] No totalPageCount found for item: 某书籍, removing both currentPage and totalPageCount fields to avoid import failure
 ```
 
 ### 功能关闭日志
+
 ```
 [DEBUG] Skipping current page as per configuration
 [WARN] No PDF page count found for item: 某书籍. This may cause XMnote import to fail.
@@ -94,22 +99,27 @@
 ## 故障排除
 
 ### 问题：条目被跳过处理
+
 **现象**: 日志显示"removing both currentPage and totalPageCount fields"
 
 **解决方案**:
+
 1. 在Zotero中编辑该条目
 2. 在"页数"或"# of Pages"字段中输入正确的页数
 3. 保存后重新导出
 
 ### 问题：仍然导入失败
+
 **现象**: 即使启用智能检测，部分条目仍导入失败
 
 **可能原因**:
+
 - XMnote服务器要求其他必需字段
 - 网络连接问题
 - 服务器配置问题
 
 **解决方案**:
+
 1. 检查详细的错误信息
 2. 确认XMnote服务器的具体要求
 3. 检查网络连接和服务器设置
@@ -117,13 +127,16 @@
 ## 技术细节
 
 ### 字段映射
+
 - `currentPage`: 当前阅读页数
 - `totalPageCount`: 书籍总页数
 
 ### API兼容性
+
 - 兼容XMnote API的页数要求
 - 遵循"totalPageCount不能为空"的验证规则
 
 ### 性能影响
+
 - 智能检测逻辑的性能开销极小
 - 不影响正常的导出速度

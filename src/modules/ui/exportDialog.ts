@@ -278,10 +278,15 @@ export class ExportDialog {
               });
 
               // 检查实际选中的导出范围（而不是依赖 dialogData）
-              const selectedRadio = dialogHelper.window?.document.querySelector('input[name="exportScope"]:checked') as HTMLInputElement;
-              const actualExportScope = selectedRadio?.value || dialogData.exportScope;
-              
-              logger.info(`Dialog exportScope: ${dialogData.exportScope}, Actual selected: ${actualExportScope}, hasPreSelected: ${hasPreSelected}`);
+              const selectedRadio = dialogHelper.window?.document.querySelector(
+                'input[name="exportScope"]:checked',
+              ) as HTMLInputElement;
+              const actualExportScope =
+                selectedRadio?.value || dialogData.exportScope;
+
+              logger.info(
+                `Dialog exportScope: ${dialogData.exportScope}, Actual selected: ${actualExportScope}, hasPreSelected: ${hasPreSelected}`,
+              );
 
               // 根据导出范围获取条目
               let targetItems: any[];
