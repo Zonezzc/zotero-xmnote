@@ -1,7 +1,7 @@
 {
   "name": "zotero-xmnote",
   "type": "module",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Zotero Xmnote Plugin",
   "config": {
     "addonName": "Zotero Xmnote Plugin",

@@ -23,21 +23,27 @@ XMnote 插件现在支持在导入时按笔记内容量智能排序，优先导�
 ## 使用场景
 
 ### 1. 学术研究
+
 优先导入您已经深度阅读和标注的核心文献：
+
 ```
 排序: totalContent (降序)
 结果: 注释最多的论文和书籍优先导入
 ```
 
 ### 2. 读书笔记整理
+
 重点关注您记录了大量笔记的书籍：
+
 ```
-排序: noteCount (降序) 
+排序: noteCount (降序)
 结果: 笔记最多的书籍优先处理
 ```
 
 ### 3. PDF 高亮复习
+
 专注于您做了大量高亮标注的材料：
+
 ```
 排序: annotationCount (降序)
 结果: 高亮标注最多的 PDF 优先导入
@@ -46,12 +52,15 @@ XMnote 插件现在支持在导入时按笔记内容量智能排序，优先导�
 ## 技术实现
 
 ### 数据统计
+
 在数据提取阶段，插件会自动统计每个条目的：
+
 - 笔记数量 (`noteCount`)
-- 注释数量 (`annotationCount`) 
+- 注释数量 (`annotationCount`)
 - 总内容量 (`totalContent = noteCount + annotationCount`)
 
 ### 排序逻辑
+
 ```typescript
 // 默认配置：内容丰富的书籍优先
 {
@@ -61,7 +70,9 @@ XMnote 插件现在支持在导入时按笔记内容量智能排序，优先导�
 ```
 
 ### 日志信息
+
 导出过程中会显示排序结果：
+
 ```
 Sorting 50 items by totalContent in desc order
 First item: "深度学习" (15 notes, 47 annotations)
@@ -88,10 +99,10 @@ Top items by content:
 ```typescript
 // 在代码中使用排序功能
 const exportOptions: ExportOptions = {
-  sortBy: "totalContent",     // 排序类型
-  sortOrder: "desc",          // 排序方向
-  includeNotes: true,         // 包含笔记
-  includeAnnotations: true    // 包含注释
+  sortBy: "totalContent", // 排序类型
+  sortOrder: "desc", // 排序方向
+  includeNotes: true, // 包含笔记
+  includeAnnotations: true, // 包含注释
 };
 
 await exporter.export(exportOptions);
@@ -100,6 +111,7 @@ await exporter.export(exportOptions);
 ## 未来增强
 
 计划中的改进包括：
+
 - 按内容质量排序（基于笔记长度）
 - 按最后修改时间排序
 - 自定义权重配置（笔记权重 vs 注释权重）
