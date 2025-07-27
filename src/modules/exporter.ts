@@ -281,7 +281,7 @@ export class DataExporter {
   // 对项目进行排序
   private sortItems(items: ZoteroItem[], options: ExportOptions): ZoteroItem[] {
     const sortBy = options.sortBy || "totalContent"; // 默认按总内容量排序
-    const sortOrder = options.sortOrder || "asc"; // 默认升序，笔记少的先导入，笔记多的最后导入
+    const sortOrder = options.sortOrder || "desc"; // 默认降序
 
     if (sortBy === "none") {
       return items;
@@ -336,51 +336,22 @@ export class DataExporter {
       const last = sortedItems[sortedItems.length - 1];
 
       logger.info(
-        `Sorting completed. First item (imported first): "${first.title}" (${first.noteCount || 0} notes, ${first.annotationCount || 0} annotations)`,
+        `Sorting completed. First item: "${first.title}" (${first.noteCount || 0} notes, ${first.annotationCount || 0} annotations)`,
       );
       logger.info(
-        `Last item (imported last): "${last.title}" (${last.noteCount || 0} notes, ${last.annotationCount || 0} annotations)`,
+        `Last item: "${last.title}" (${last.noteCount || 0} notes, ${last.annotationCount || 0} annotations)`,
       );
 
-      // 根据排序顺序显示相应的项目
-      if (sortOrder === "asc") {
-        // 升序：显示最先导入的（内容少的）和最后导入的（内容多的）
-        const firstItems = sortedItems.slice(
-          0,
-          Math.min(3, sortedItems.length),
+      // 显示内容丰富的前5个项目
+      const topItems = sortedItems.slice(0, Math.min(5, sortedItems.length));
+      logger.info("Top items by content:");
+      topItems.forEach((item, index) => {
+        const totalContent =
+          (item.noteCount || 0) + (item.annotationCount || 0);
+        logger.info(
+          `  ${index + 1}. "${item.title}": ${totalContent} total (${item.noteCount || 0} notes + ${item.annotationCount || 0} annotations)`,
         );
-        const lastItems = sortedItems.slice(-Math.min(3, sortedItems.length));
-
-        logger.info("Items imported first (less content):");
-        firstItems.forEach((item, index) => {
-          const totalContent =
-            (item.noteCount || 0) + (item.annotationCount || 0);
-          logger.info(
-            `  ${index + 1}. "${item.title}": ${totalContent} total (${item.noteCount || 0} notes + ${item.annotationCount || 0} annotations)`,
-          );
-        });
-
-        logger.info("Items imported last (more content):");
-        lastItems.forEach((item, index) => {
-          const totalContent =
-            (item.noteCount || 0) + (item.annotationCount || 0);
-          const position = sortedItems.length - lastItems.length + index + 1;
-          logger.info(
-            `  ${position}. "${item.title}": ${totalContent} total (${item.noteCount || 0} notes + ${item.annotationCount || 0} annotations)`,
-          );
-        });
-      } else {
-        // 降序：显示内容最多的前几个
-        const topItems = sortedItems.slice(0, Math.min(5, sortedItems.length));
-        logger.info("Top items by content:");
-        topItems.forEach((item, index) => {
-          const totalContent =
-            (item.noteCount || 0) + (item.annotationCount || 0);
-          logger.info(
-            `  ${index + 1}. "${item.title}": ${totalContent} total (${item.noteCount || 0} notes + ${item.annotationCount || 0} annotations)`,
-          );
-        });
-      }
+      });
     }
 
     return sortedItems;
