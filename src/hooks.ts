@@ -3,7 +3,6 @@ import { registerPrefsScripts as registerXMnotePrefsScripts } from "./modules/co
 import { createZToolkit } from "./utils/ztoolkit";
 import { logger } from "./utils/logger";
 import { configManager } from "./modules/config/settings";
-import { simpleExportTest } from "./modules/simple-export";
 
 async function onStartup() {
   await Promise.all([
@@ -32,11 +31,6 @@ async function onStartup() {
     const { ContextMenuHandler } = await import("./modules/ui/contextMenu");
     ContextMenuHandler.registerItemContextMenu();
     ContextMenuHandler.registerCollectionContextMenu();
-
-    // 创建全局测试对象（仅用于开发测试）
-    (Zotero as any).XMnoteTest = {
-      runTest: simpleExportTest,
-    };
 
     logger.info("XMnote menus and context menus registered successfully");
   } catch (error) {
@@ -88,21 +82,12 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
 
 async function onMainWindowUnload(win: Window): Promise<void> {
   ztoolkit.unregisterAll();
-  addon.data.dialog?.window?.close();
 }
 
 function onShutdown(): void {
   logger.info("Shutting down XMnote plugin");
 
-  // 清理全局对象
-  try {
-    delete (Zotero as any).XMnoteTest;
-  } catch (error) {
-    logger.error("Failed to cleanup global objects:", error);
-  }
-
   ztoolkit.unregisterAll();
-  addon.data.dialog?.window?.close();
   // Remove addon object
   addon.data.alive = false;
   // @ts-expect-error - Plugin instance is not typed

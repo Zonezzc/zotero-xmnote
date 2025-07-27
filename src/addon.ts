@@ -1,5 +1,4 @@
 import { config } from "../package.json";
-import { ColumnOptions, DialogHelper } from "zotero-plugin-toolkit";
 import hooks from "./hooks";
 import { createZToolkit } from "./utils/ztoolkit";
 import { ExportDialog } from "./modules/ui/exportDialog";
@@ -18,12 +17,6 @@ class Addon {
     locale?: {
       current: any;
     };
-    prefs?: {
-      window: Window;
-      columns: Array<ColumnOptions>;
-      rows: Array<{ [dataKey: string]: string }>;
-    };
-    dialog?: DialogHelper;
   };
   // Lifecycle hooks
   public hooks: typeof hooks;

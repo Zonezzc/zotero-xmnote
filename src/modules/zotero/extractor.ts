@@ -179,11 +179,15 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
   // 提取单个条目
   private extractItem(item: any): ZoteroItem | null {
     try {
-      logger.debug(`Extracting item: ${item.getField("title")} (ID: ${item.id})`);
-      
+      logger.debug(
+        `Extracting item: ${item.getField("title")} (ID: ${item.id})`,
+      );
+
       const attachments = this.extractAttachments(item);
-      logger.debug(`Got ${attachments.length} attachments for item: ${item.getField("title")}`);
-      
+      logger.debug(
+        `Got ${attachments.length} attachments for item: ${item.getField("title")}`,
+      );
+
       return {
         id: item.id,
         title: item.getField("title") || "",
@@ -256,9 +260,11 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
   private extractAttachments(item: any): import("./types").ZoteroAttachment[] {
     try {
       const result: import("./types").ZoteroAttachment[] = [];
-      
+
       // 添加调试日志确认被调用
-      logger.debug(`Attachment extraction called for item: ${item.getField("title")}`);
+      logger.debug(
+        `Attachment extraction called for item: ${item.getField("title")}`,
+      );
 
       logger.debug(
         `Starting attachment extraction for item: ${item.getField("title")} (ID: ${item.id})`,
@@ -419,10 +425,14 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
         }
       }
 
-      logger.info(`[ATTACHMENT DEBUG] Successfully extracted ${result.length} attachments`);
+      logger.info(
+        `[ATTACHMENT DEBUG] Successfully extracted ${result.length} attachments`,
+      );
       if (result.length > 0) {
         result.forEach((att, index) => {
-          logger.info(`[ATTACHMENT DEBUG] Attachment ${index}: ${att.title}, type: ${att.contentType}`);
+          logger.info(
+            `[ATTACHMENT DEBUG] Attachment ${index}: ${att.title}, type: ${att.contentType}`,
+          );
         });
       }
       return result;

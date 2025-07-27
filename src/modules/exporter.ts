@@ -225,10 +225,14 @@ export class DataExporter {
           const zoteroItem = Zotero.Items.get(itemId);
           if (zoteroItem && zoteroItem.isRegularItem() && !zoteroItem.deleted) {
             // 使用完整的extractItem方法来获取包含附件的完整数据
-            const extractedItem = (this.extractor as any).extractItem(zoteroItem);
+            const extractedItem = (this.extractor as any).extractItem(
+              zoteroItem,
+            );
             if (extractedItem) {
               items.push(extractedItem);
-              logger.info(`[EXTRACT FIX] Extracted item with ${extractedItem.attachments?.length || 0} attachments: ${extractedItem.title}`);
+              logger.info(
+                `[EXTRACT FIX] Extracted item with ${extractedItem.attachments?.length || 0} attachments: ${extractedItem.title}`,
+              );
             }
           }
         } catch (error) {

@@ -97,19 +97,25 @@ export class DataTransformerImpl implements DataTransformer {
 
   // 确定书籍类型
   private determineBookType(item: ZoteroItem): 0 | 1 {
-    logger.info(`Determining book type for item: ${item.title}, itemType: ${item.itemType}`);
-    
+    logger.info(
+      `Determining book type for item: ${item.title}, itemType: ${item.itemType}`,
+    );
+
     // 优先检查是否有PDF附件，有PDF则认为是电子书
     if (item.attachments && item.attachments.length > 0) {
-      logger.info(`Found ${item.attachments.length} attachments for item: ${item.title}`);
-      const hasPdf = item.attachments.some(
-        (attachment) => {
-          logger.info(`Attachment: ${attachment.title}, contentType: ${attachment.contentType}`);
-          return attachment.contentType === "application/pdf";
-        },
+      logger.info(
+        `Found ${item.attachments.length} attachments for item: ${item.title}`,
       );
+      const hasPdf = item.attachments.some((attachment) => {
+        logger.info(
+          `Attachment: ${attachment.title}, contentType: ${attachment.contentType}`,
+        );
+        return attachment.contentType === "application/pdf";
+      });
       if (hasPdf) {
-        logger.info(`Found PDF attachment, identifying as ebook (type: 1) for item: ${item.title}`);
+        logger.info(
+          `Found PDF attachment, identifying as ebook (type: 1) for item: ${item.title}`,
+        );
         return 1; // 有PDF附件，识别为电子书
       } else {
         logger.info(`No PDF attachments found for item: ${item.title}`);
@@ -123,15 +129,21 @@ export class DataTransformerImpl implements DataTransformer {
     const digitalTypes = ["computerProgram", "webpage", "blogPost"];
 
     if (physicalTypes.includes(item.itemType)) {
-      logger.info(`ItemType '${item.itemType}' is physical type, identifying as physical book (type: 0) for item: ${item.title}`);
+      logger.info(
+        `ItemType '${item.itemType}' is physical type, identifying as physical book (type: 0) for item: ${item.title}`,
+      );
       return 0; // 纸质书
     } else if (digitalTypes.includes(item.itemType)) {
-      logger.info(`ItemType '${item.itemType}' is digital type, identifying as ebook (type: 1) for item: ${item.title}`);
+      logger.info(
+        `ItemType '${item.itemType}' is digital type, identifying as ebook (type: 1) for item: ${item.title}`,
+      );
       return 1; // 电子书
     }
 
     // 默认为电子书
-    logger.info(`ItemType '${item.itemType}' not recognized, defaulting to ebook (type: 1) for item: ${item.title}`);
+    logger.info(
+      `ItemType '${item.itemType}' not recognized, defaulting to ebook (type: 1) for item: ${item.title}`,
+    );
     return 1;
   }
 
