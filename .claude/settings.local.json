@@ -27,7 +27,9 @@
       "Bash(gh release:*)",
       "Bash(--title \"v1.2.0: Enhanced Book Type Detection & PDF Attachment Support\" )",
       "Bash(--notes \"## 🎯 Key Features\n\n### 📚 Smart Book Type Detection\n- **PDF attachments now correctly identify books as electronic books (type: 1)**\n- Physical books without PDFs remain as physical books (type: 0)\n- Maintains page count information during attachment extraction\n\n### 🔧 Technical Improvements\n- Fixed attachment extraction in quick export workflow\n- Enhanced data extraction to include complete item metadata\n- Improved PDF attachment processing and page count detection\n- Added comprehensive debug logging for troubleshooting\n\n### 🐛 Bug Fixes\n- Fixed missing attachments field in selected items extraction\n- Resolved page count loss during book type conversion\n- Enhanced error handling in attachment processing\n\n## 📊 What''s Changed\n- Modified \\`ZoteroDataExtractorImpl.extractItem()\\` to include numPages field\n- Updated \\`DataExporter.extractData()\\` to use complete item extraction\n- Enhanced PDF detection logic in \\`DataTransformerImpl.determineBookType()\\`\n\n## 📚 Perfect For\nUsers with mixed libraries of physical books and PDF ebooks, ensuring correct categorization in XMnote.\n\n## 📦 Installation\n1. Download the \\`zotero-xmnote-plugin.xpi\\` file from this release\n2. In Zotero, go to Tools → Add-ons\n3. Click the gear icon → Install Add-on From File\n4. Select the downloaded .xpi file\n5. Restart Zotero\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\" )",
-      "Bash(.scaffold/build/zotero-xmnote-plugin.xpi)"
+      "Bash(.scaffold/build/zotero-xmnote-plugin.xpi)",
+      "Bash(git describe:*)",
+      "Bash(timeout 10 npm run release)"
     ],
     "deny": []
   }
