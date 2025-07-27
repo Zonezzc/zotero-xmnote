@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Zotero plugin project called "Zotero Xmnote Plugin" built using the Zotero Plugin Template. It's a TypeScript-based plugin that extends Zotero's functionality using the zotero-plugin-toolkit and zotero-plugin-scaffold.
+This is a Zotero plugin project called "Zotero Xmnote Plugin" built using the Zotero Plugin Template. It's a
+TypeScript-based plugin that integrates Zotero with XMnote server for data export and synchronization, using the
+zotero-plugin-toolkit and zotero-plugin-scaffold.
 
 ## Development Commands
 
@@ -38,20 +40,25 @@ The plugin follows a modular event-driven architecture:
 
 - **Global Setup**: Registers `ztoolkit` and plugin instance under `Zotero[config.addonInstance]`
 - **Hook System**: Dispatches events to appropriate handlers (onStartup, onShutdown, onNotify, etc.)
-- **Factory Pattern**: Example modules use factory classes for different functionality types
+- **XMnote Integration**: Core functionality for exporting Zotero data to XMnote server
 - **Hot Reload**: Development mode supports automatic recompilation and plugin reload
 
 ### Module Organization
 
-- `src/modules/examples.ts` - Example implementations for various Zotero APIs
+- `src/modules/config/` - Configuration management (preferences, settings, types)
+- `src/modules/ui/` - User interface components (menus, dialogs, context menus)
+- `src/modules/xmnote/` - XMnote API client and types
+- `src/modules/zotero/` - Zotero data extraction and transformation
+- `src/modules/exporter.ts` - Data export orchestration
 - `src/modules/preferenceScript.ts` - Preference pane configuration
-- `src/utils/` - Utility functions for locale, preferences, window management, and ztoolkit
+- `src/utils/` - Utility functions for locale, preferences, window management, logging, and ztoolkit
 
 ### Configuration
 
 - Plugin metadata defined in `package.json` config section (addonName, addonID, addonRef, etc.)
 - Build configuration in `zotero-plugin.config.ts` using zotero-plugin-scaffold
 - TypeScript configuration targets Firefox 115
+- Multi-language support via locale files in `addon/locale/`
 
 ### Development Environment
 
@@ -62,3 +69,11 @@ The plugin follows a modular event-driven architecture:
 ## Testing
 
 Tests are located in the `test/` directory and use the zotero-plugin scaffold test framework. The test configuration waits for plugin initialization via `Zotero.${addonInstance}.data.initialized`.
+
+# important-instruction-reminders
+
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly
+requested by the User.
