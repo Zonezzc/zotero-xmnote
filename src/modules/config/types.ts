@@ -6,6 +6,20 @@ export interface XMnoteConfig {
   timeout?: number;
 }
 
+export interface PunctuationOptions {
+  comma: boolean; // , → ，
+  period: boolean; // . → 。
+  questionMark: boolean; // ? → ？
+  exclamationMark: boolean; // ! → ！
+  colon: boolean; // : → ：
+  semicolon: boolean; // ; → ；
+  parentheses: boolean; // () → （）
+  brackets: boolean; // [] → ［］
+  braces: boolean; // {} → ｛｝
+  doubleQuotes: boolean; // "" → ""
+  singleQuotes: boolean; // '' → ''
+}
+
 export interface ImportOptions {
   includeNotes: boolean;
   includeAnnotations: boolean;
@@ -14,6 +28,7 @@ export interface ImportOptions {
   batchSize: number;
   retryCount: number;
   timeoutMs: number;
+  punctuationOptions: PunctuationOptions;
 }
 
 export interface UIConfig {

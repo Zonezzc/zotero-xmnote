@@ -37,6 +37,17 @@ function initializePrefsUI(window: Window) {
     "xmnote-include-annotations",
     "xmnote-include-metadata",
     "xmnote-include-current-page",
+    "xmnote-punctuation-comma",
+    "xmnote-punctuation-period",
+    "xmnote-punctuation-question-mark",
+    "xmnote-punctuation-exclamation-mark",
+    "xmnote-punctuation-colon",
+    "xmnote-punctuation-semicolon",
+    "xmnote-punctuation-parentheses",
+    "xmnote-punctuation-brackets",
+    "xmnote-punctuation-braces",
+    "xmnote-punctuation-double-quotes",
+    "xmnote-punctuation-single-quotes",
     "xmnote-batch-size",
     "xmnote-retry-count",
     "xmnote-show-progress",
@@ -133,6 +144,63 @@ function loadCurrentConfig(window: Window) {
       doc,
       "xmnote-include-current-page",
       config.importOptions.includeCurrentPage,
+    );
+
+    // 标点符号替换选项
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-comma",
+      config.importOptions.punctuationOptions.comma,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-period",
+      config.importOptions.punctuationOptions.period,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-question-mark",
+      config.importOptions.punctuationOptions.questionMark,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-exclamation-mark",
+      config.importOptions.punctuationOptions.exclamationMark,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-colon",
+      config.importOptions.punctuationOptions.colon,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-semicolon",
+      config.importOptions.punctuationOptions.semicolon,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-parentheses",
+      config.importOptions.punctuationOptions.parentheses,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-brackets",
+      config.importOptions.punctuationOptions.brackets,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-braces",
+      config.importOptions.punctuationOptions.braces,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-double-quotes",
+      config.importOptions.punctuationOptions.doubleQuotes,
+    );
+    setCheckboxValue(
+      doc,
+      "xmnote-punctuation-single-quotes",
+      config.importOptions.punctuationOptions.singleQuotes,
     );
     setInputValue(
       doc,
@@ -298,6 +366,22 @@ function getConfigFromUI(window: Window): PluginConfig | null {
       includeAnnotations: getCheckboxValue(doc, "xmnote-include-annotations"),
       includeMetadata: getCheckboxValue(doc, "xmnote-include-metadata"),
       includeCurrentPage: getCheckboxValue(doc, "xmnote-include-current-page"),
+      punctuationOptions: {
+        comma: getCheckboxValue(doc, "xmnote-punctuation-comma"),
+        period: getCheckboxValue(doc, "xmnote-punctuation-period"),
+        questionMark: getCheckboxValue(doc, "xmnote-punctuation-question-mark"),
+        exclamationMark: getCheckboxValue(
+          doc,
+          "xmnote-punctuation-exclamtion-mark",
+        ),
+        colon: getCheckboxValue(doc, "xmnote-punctuation-colon"),
+        semicolon: getCheckboxValue(doc, "xmnote-punctuation-semicolon"),
+        parentheses: getCheckboxValue(doc, "xmnote-punctuation-parentheses"),
+        brackets: getCheckboxValue(doc, "xmnote-punctuation-brackets"),
+        braces: getCheckboxValue(doc, "xmnote-punctuation-braces"),
+        doubleQuotes: getCheckboxValue(doc, "xmnote-punctuation-double-quotes"),
+        singleQuotes: getCheckboxValue(doc, "xmnote-punctuation-singe-quotes"),
+      },
       batchSize: parseInt(getInputValue(doc, "xmnote-batch-size") || "10"),
       retryCount: parseInt(getInputValue(doc, "xmnote-retry-count") || "3"),
       timeoutMs: xmnoteServer.timeout || 30000,

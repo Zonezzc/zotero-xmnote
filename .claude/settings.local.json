@@ -30,7 +30,9 @@
       "Bash(.scaffold/build/zotero-xmnote-plugin.xpi)",
       "Bash(git describe:*)",
       "Bash(timeout 10 npm run release)",
-      "Bash(git revert:*)"
+      "Bash(git revert:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)"
     ],
     "deny": []
   }

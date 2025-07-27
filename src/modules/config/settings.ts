@@ -2,13 +2,7 @@
 
 import { config as packageConfig } from "../../../package.json";
 import { logger } from "../../utils/logger";
-import type {
-  ImportOptions,
-  PluginConfig,
-  UIConfig,
-  ValidationResult,
-  XMnoteConfig,
-} from "./types";
+import type { ImportOptions, PluginConfig, UIConfig, XMnoteConfig } from "./types";
 
 export class ConfigManager {
   private static instance: ConfigManager;
@@ -34,6 +28,19 @@ export class ConfigManager {
         includeAnnotations: true,
         includeMetadata: true,
         includeCurrentPage: true, // 默认包含当前页数（智能检测）
+        punctuationOptions: {
+          comma: false,
+          period: false,
+          questionMark: false,
+          exclamationMark: false,
+          colon: false,
+          semicolon: false,
+          parentheses: false,
+          brackets: false,
+          braces: false,
+          doubleQuotes: false,
+          singleQuotes: false,
+        },
         batchSize: 10,
         retryCount: 3,
         timeoutMs: 30000,
@@ -91,6 +98,63 @@ export class ConfigManager {
             (Zotero.Prefs.get(
               `${prefPrefix}.xmnote.import.includeCurrentPage`,
             ) as boolean) ?? defaultConfig.importOptions.includeCurrentPage,
+          punctuationOptions: {
+            comma:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.comma,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.comma,
+            period:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.period,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.period,
+            questionMark:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.questionMark,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.questionMark,
+            exclamationMark:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.exclamationMark,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.exclamationMark,
+            colon:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.colon,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.colon,
+            semicolon:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.semicolon,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.semicolon,
+            parentheses:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.parentheses,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.parentheses,
+            brackets:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.brackets,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.brackets,
+            braces:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.braces,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.braces,
+            doubleQuotes:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.doubleQuotes,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.doubleQuotes,
+            singleQuotes:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.punctuation.singleQuotes,
+              ) as boolean) ??
+              defaultConfig.importOptions.punctuationOptions.singleQuote,
+          },
           batchSize:
             (Zotero.Prefs.get(
               `${prefPrefix}.xmnote.import.batchSize`,
@@ -160,6 +224,52 @@ export class ConfigManager {
       Zotero.Prefs.set(
         `${prefPrefix}.xmnote.import.includeCurrentPage`,
         config.importOptions.includeCurrentPage,
+      );
+
+      // 保存标点符号选项
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.comma`,
+        config.importOptions.punctuationOptions.comma,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.period`,
+        config.importOptions.punctuationOptions.period,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.questionMark`,
+        config.importOptions.punctuationOptions.questionMark,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.exclamationMark`,
+        config.importOptions.punctuationOptions.exclamationMark,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.colon`,
+        config.importOptions.punctuationOptions.colon,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.semicolon`,
+        config.importOptions.punctuationOptions.semicolon,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.parentheses`,
+        config.importOptions.punctuationOptions.parentheses,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.brackets`,
+        config.importOptions.punctuationOptions.brackets,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.braces`,
+        config.importOptions.punctuationOptions.braces,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.doubleQuotes`,
+        config.importOptions.punctuationOptions.doubleQuotes,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.punctuation.singleQuotes`,
+        config.importOptions.punctuationOptions.singleQuotes,
       );
       Zotero.Prefs.set(
         `${prefPrefix}.xmnote.import.batchSize`,

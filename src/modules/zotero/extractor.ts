@@ -1,13 +1,85 @@
 // Zotero 数据提取器
 
 import { logger } from "../../utils/logger";
+import { configManager } from "../config/settings";
+import type {
+  ZoteroAnnotation,
+  ZoteroCreator,
+  ZoteroDataExtractor,
+  ZoteroItem,
+  ZoteroMetadata,
+  ZoteroNote,
+  ZoteroTag,
+} from "./types";
 
-// 处理文本：去除所有空格，然后在中英文、数字与中文之间添加空格
-function processTextSpacing(text: string): string {
+// 替换英文标点符号为中文标点符号（根据用户配置）
+function replacePunctuation(
+  text: string,
+  options: import("../config/types").PunctuationOptions,
+): string {
+  if (!text) return "";
+
+  let processed = text;
+
+  // 根据配置选择性替换标点符号
+  if (options.comma) {
+    processed = processed.replace(/,/g, "，");
+  }
+  if (options.period) {
+    processed = processed.replace(/\./g, "。");
+  }
+  if (options.questionMark) {
+    processed = processed.replace(/\?/g, "？");
+  }
+  if (options.exclamationMark) {
+    processed = processed.replace(/!/g, "！");
+  }
+  if (options.colon) {
+    processed = processed.replace(/:/g, "：");
+  }
+  if (options.semicolon) {
+    processed = processed.replace(/;/g, "；");
+  }
+  if (options.parentheses) {
+    processed = processed.replace(/\(/g, "（");
+    processed = processed.replace(/\)/g, "）");
+  }
+  if (options.brackets) {
+    processed = processed.replace(/\[/g, "［");
+    processed = processed.replace(/\]/g, "］");
+  }
+  if (options.braces) {
+    processed = processed.replace(/\{/g, "｛");
+    processed = processed.replace(/\}/g, "｝");
+  }
+  if (options.doubleQuotes) {
+    // 智能替换双引号为左右引号
+    processed = processed.replace(/"([^"]*)"/g, `"$1"`);
+    // 处理未配对的双引号
+    processed = processed.replace(/"/g, "\u201c");
+  }
+  if (options.singleQuotes) {
+    // 智能替换单引号为左右引号
+    processed = processed.replace(/'([^']*)'/g, `'$1'`);
+    // 处理未配对的单引号
+    processed = processed.replace(/'/g, "\u2018");
+  }
+
+  return processed;
+}
+
+// 处理文本：去除所有空格，然后在中英文、数字与中文之间添加空格，根据配置替换标点符号
+function processTextSpacing(
+  text: string,
+  punctuationOptions: import("../config/types").PunctuationOption,
+): string {
   if (!text) return "";
 
   // 先去除所有空格
   let processed = text.replace(/\s/g, "");
+
+  // 根据配置替换标点符号
+  processed = replacePunctuation(processed, punctuationOptions);
 
   // 在中文和英文之间添加空格
   processed = processed.replace(/([\u4e00-\u9fff])([a-zA-Z])/g, "$1 $2");
@@ -19,15 +91,6 @@ function processTextSpacing(text: string): string {
 
   return processed;
 }
-import type {
-  ZoteroAnnotation,
-  ZoteroCreator,
-  ZoteroDataExtractor,
-  ZoteroItem,
-  ZoteroMetadata,
-  ZoteroNote,
-  ZoteroTag,
-} from "./types";
 
 export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
   // 获取所有条目
@@ -477,7 +540,10 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
         id: noteItem.id,
         parentItemID: noteItem.parentItemID,
         title: noteItem.getField("title") || "",
-        note: processTextSpacing(noteItem.getNote() || ""),
+        note: processTextSpacing(
+          noteItem.getNote() || "",
+          configManager.getConfig().importOptions.punctuationOptions,
+        ),
         dateAdded: new Date(noteItem.dateAdded),
         dateModified: new Date(noteItem.dateModified),
       };
@@ -490,11 +556,15 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
   // 提取注释
   private extractAnnotation(annotationItem: any): ZoteroAnnotation | null {
     try {
+      const punctuationOptions =
+        configManager.getConfig().importOptions.punctuationOptions;
       const annotationText = processTextSpacing(
         annotationItem.annotationText || "",
+        punctuationOptions,
       );
       const annotationComment = processTextSpacing(
         annotationItem.annotationComment || "",
+        punctuationOption,
       );
 
       return {
