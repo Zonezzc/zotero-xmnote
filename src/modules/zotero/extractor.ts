@@ -68,24 +68,33 @@ function replacePunctuation(
   return processed;
 }
 
-// 处理文本：去除所有空格，然后在中英文、数字与中文之间添加空格，根据配置替换标点符号
+// 处理文本：智能处理空格，保留英文单词间空格，在中英文、数字与中文之间添加空格，根据配置替换标点符号
 function processTextSpacing(
   text: string,
-  punctuationOptions: import("../config/types").PunctuationOption,
+  punctuationOptions: import("../config/types").PunctuationOptions,
 ): string {
   if (!text) return "";
 
-  // 先去除所有空格
-  let processed = text.replace(/\s/g, "");
+  // 先规范化空格：将多个连续空格替换为单个空格，去除首尾空格
+  let processed = text.replace(/\s+/g, " ").trim();
 
   // 根据配置替换标点符号
   processed = replacePunctuation(processed, punctuationOptions);
 
-  // 在中文和英文之间添加空格
+  // 去除中文字符周围的多余空格，但保留英文单词间的空格
+  // 去除中文字符前后的空格
+  processed = processed.replace(/\s+([\u4e00-\u9fff])/g, "$1");
+  processed = processed.replace(/([\u4e00-\u9fff])\s+/g, "$1");
+
+  // 去除中文字符和数字之间的空格
+  processed = processed.replace(/([\u4e00-\u9fff])\s+([0-9])/g, "$1$2");
+  processed = processed.replace(/([0-9])\s+([\u4e00-\u9fff])/g, "$1$2");
+
+  // 在中文和英文之间添加空格（如果还没有的话）
   processed = processed.replace(/([\u4e00-\u9fff])([a-zA-Z])/g, "$1 $2");
   processed = processed.replace(/([a-zA-Z])([\u4e00-\u9fff])/g, "$1 $2");
 
-  // 在数字和中文之间添加空格
+  // 在数字和中文之间添加空格（如果还没有的话）
   processed = processed.replace(/([\u4e00-\u9fff])([0-9])/g, "$1 $2");
   processed = processed.replace(/([0-9])([\u4e00-\u9fff])/g, "$1 $2");
 
@@ -564,7 +573,7 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
       );
       const annotationComment = processTextSpacing(
         annotationItem.annotationComment || "",
-        punctuationOption,
+        punctuationOptions,
       );
 
       return {

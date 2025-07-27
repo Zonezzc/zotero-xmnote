@@ -106,54 +106,54 @@ export class ConfigManager {
               defaultConfig.importOptions.punctuationOptions.comma,
             period:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.period,
+                `${prefPrefix}.xmnote.punctuation.period`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.period,
             questionMark:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.questionMark,
+                `${prefPrefix}.xmnote.punctuation.questionMark`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.questionMark,
             exclamationMark:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.exclamationMark,
+                `${prefPrefix}.xmnote.punctuation.exclamationMark`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.exclamationMark,
             colon:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.colon,
+                `${prefPrefix}.xmnote.punctuation.colon`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.colon,
             semicolon:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.semicolon,
+                `${prefPrefix}.xmnote.punctuation.semicolon`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.semicolon,
             parentheses:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.parentheses,
+                `${prefPrefix}.xmnote.punctuation.parentheses`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.parentheses,
             brackets:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.brackets,
+                `${prefPrefix}.xmnote.punctuation.brackets`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.brackets,
             braces:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.braces,
+                `${prefPrefix}.xmnote.punctuation.braces`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.braces,
             doubleQuotes:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.doubleQuotes,
+                `${prefPrefix}.xmnote.punctuation.doubleQuotes`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.doubleQuotes,
             singleQuotes:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.singleQuotes,
+                `${prefPrefix}.xmnote.punctuation.singleQuotes`,
               ) as boolean) ??
-              defaultConfig.importOptions.punctuationOptions.singleQuote,
+              defaultConfig.importOptions.punctuationOptions.singleQuotes,
           },
           batchSize:
             (Zotero.Prefs.get(
