@@ -12,7 +12,7 @@ import type {
   ZoteroTag,
 } from "./types";
 
-// 替换英文标点符号为中文标点符号（根据用户配置）
+// 替换英文标点符号为中文标点符号（根据用户配置），避免在特定上下文中替换
 function replacePunctuation(
   text: string,
   options: import("../config/types").PunctuationOptions,
@@ -21,48 +21,102 @@ function replacePunctuation(
 
   let processed = text;
 
-  // 根据配置选择性替换标点符号
+  // 根据配置选择性替换标点符号，使用智能上下文检测
   if (options.comma) {
-    processed = processed.replace(/,/g, "，");
+    // 避免在数字中替换逗号（如：1,234.56）
+    processed = processed.replace(/,(?!\d{3}(?:\.\d+)?(?:\s|$))/g, "，");
   }
+
   if (options.period) {
+    // 分步骤处理句号替换，避免在特定上下文中替换
+
+    // 先标记需要保护的句号（用特殊标记临时替换）
+    const PROTECTED_PERIOD = "\uE000"; // 使用私用区字符作为临时标记
+
+    // 保护省略号（如：...、......）
+    processed = processed.replace(/\.{2,}/g, (match) =>
+      PROTECTED_PERIOD.repeat(match.length),
+    );
+
+    // 保护数字后面的句号（如：1. 2. 3.）
+    processed = processed.replace(/(\d)\./g, `$1${PROTECTED_PERIOD}`);
+
+    // 保护小数（如：3.14）
+    processed = processed.replace(/(\d)\.(\d)/g, `$1${PROTECTED_PERIOD}$2`);
+
+    // 保护缩写（如：Mr. Dr.）
+    processed = processed.replace(/([A-Z][a-z]*)\./g, `$1${PROTECTED_PERIOD}`);
+
+    // 保护文件扩展名（如：.txt .pdf）
+    processed = processed.replace(
+      /\.([a-z]{2,4})(?=\s|$|[^a-zA-Z])/g,
+      `${PROTECTED_PERIOD}$1`,
+    );
+
+    // 保护版本号（如：v1.0）
+    processed = processed.replace(
+      /(v?\d+)\.(\d+)/gi,
+      `$1${PROTECTED_PERIOD}$2`,
+    );
+
+    // 保护URL和邮箱中的句号
+    processed = processed.replace(/(www|@\w+)\./g, `$1${PROTECTED_PERIOD}`);
+
+    // 现在替换剩余的句号
     processed = processed.replace(/\./g, "。");
+
+    // 恢复被保护的句号
+    processed = processed.replace(new RegExp(PROTECTED_PERIOD, "g"), ".");
   }
+
   if (options.questionMark) {
-    processed = processed.replace(/\?/g, "？");
+    // 避免在URL中替换问号
+    processed = processed.replace(/\?(?![\w=&])/g, "？");
   }
+
   if (options.exclamationMark) {
     processed = processed.replace(/!/g, "！");
   }
+
   if (options.colon) {
-    processed = processed.replace(/:/g, "：");
+    // 避免在时间、URL、比例中替换冒号
+    processed = processed.replace(/:(?!(?:\d{2})|(?:\/\/)|(?:\d+))/g, "：");
   }
+
   if (options.semicolon) {
     processed = processed.replace(/;/g, "；");
   }
+
   if (options.parentheses) {
-    processed = processed.replace(/\(/g, "（");
-    processed = processed.replace(/\)/g, "）");
+    // 避免在函数调用、数学表达式中替换括号
+    processed = processed.replace(/\((?![a-zA-Z_]\w*\s*[,)])/g, "（");
+    processed = processed.replace(/\)(?!\s*[{;,.])/g, "）");
   }
+
   if (options.brackets) {
-    processed = processed.replace(/\[/g, "［");
-    processed = processed.replace(/\]/g, "］");
+    // 避免在数组、引用中替换方括号
+    processed = processed.replace(/\[(?!\d+\])/g, "［");
+    processed = processed.replace(/\](?!\s*[,;.])/g, "］");
   }
+
   if (options.braces) {
-    processed = processed.replace(/\{/g, "｛");
-    processed = processed.replace(/\}/g, "｝");
+    // 避免在代码块、对象中替换花括号
+    processed = processed.replace(/\{(?!\s*[a-zA-Z_"'])/g, "｛");
+    processed = processed.replace(/\}(?!\s*[,;.])/g, "｝");
   }
+
   if (options.doubleQuotes) {
-    // 智能替换双引号为左右引号
-    processed = processed.replace(/"([^"]*)"/g, `"$1"`);
+    // 智能替换双引号为左右引号，避免在代码中替换
+    processed = processed.replace(/"([^"]*)"(?!\s*[,;:\]})])/g, `"$1"`);
     // 处理未配对的双引号
-    processed = processed.replace(/"/g, "\u201c");
+    processed = processed.replace(/"(?![a-zA-Z_]\w*"|')/g, "\u201c");
   }
+
   if (options.singleQuotes) {
-    // 智能替换单引号为左右引号
-    processed = processed.replace(/'([^']*)'/g, `'$1'`);
-    // 处理未配对的单引号
-    processed = processed.replace(/'/g, "\u2018");
+    // 智能替换单引号为左右引号，避免在缩写、代码中替换
+    processed = processed.replace(/'([^']*)'(?!\w)/g, `'$1'`);
+    // 处理未配对的单引号（避免缩写如don't, can't）
+    processed = processed.replace(/'(?![a-z]{1,2}(?:\s|$))/g, "\u2018");
   }
 
   return processed;

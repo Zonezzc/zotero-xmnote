@@ -3,7 +3,12 @@
 import { configManager } from "./settings";
 import { getXMnoteApiClient } from "../xmnote/api";
 import { logger } from "../../utils/logger";
-import type { ImportOptions, PluginConfig, UIConfig, XMnoteConfig } from "./types";
+import type {
+  ImportOptions,
+  PluginConfig,
+  UIConfig,
+  XMnoteConfig,
+} from "./types";
 
 export function registerPrefsScripts(window: Window) {
   // 初始化首选项界面
@@ -375,7 +380,7 @@ function getConfigFromUI(window: Window): PluginConfig | null {
         brackets: getCheckboxValue(doc, "xmnote-punctuation-brackets"),
         braces: getCheckboxValue(doc, "xmnote-punctuation-braces"),
         doubleQuotes: getCheckboxValue(doc, "xmnote-punctuation-double-quotes"),
-        singleQuotes: getCheckboxValue(doc, "xmnote-punctuation-single-quotes",
+        singleQuotes: getCheckboxValue(doc, "xmnote-punctuation-single-quotes"),
       },
       batchSize: parseInt(getInputValue(doc, "xmnote-batch-size") || "10"),
       retryCount: parseInt(getInputValue(doc, "xmnote-retry-count") || "3"),

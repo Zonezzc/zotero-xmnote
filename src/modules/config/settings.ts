@@ -2,7 +2,13 @@
 
 import { config as packageConfig } from "../../../package.json";
 import { logger } from "../../utils/logger";
-import type { ImportOptions, PluginConfig, UIConfig, XMnoteConfig } from "./types";
+import type {
+  ImportOptions,
+  PluginConfig,
+  UIConfig,
+  ValidationResult,
+  XMnoteConfig,
+} from "./types";
 
 export class ConfigManager {
   private static instance: ConfigManager;
@@ -101,7 +107,7 @@ export class ConfigManager {
           punctuationOptions: {
             comma:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuation.comma,
+                `${prefPrefix}.xmnote.punctuaion.comma`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.comma,
             period:
