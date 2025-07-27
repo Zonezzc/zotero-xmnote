@@ -107,7 +107,7 @@ export class ConfigManager {
           punctuationOptions: {
             comma:
               (Zotero.Prefs.get(
-                `${prefPrefix}.xmnote.punctuaion.comma`,
+                `${prefPrefix}.xmnote.punctuation.comma`,
               ) as boolean) ??
               defaultConfig.importOptions.punctuationOptions.comma,
             period:
