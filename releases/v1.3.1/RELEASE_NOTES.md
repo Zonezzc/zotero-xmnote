@@ -33,19 +33,22 @@ XMnote Plugin now automatically prioritizes books with rich content, ensuring yo
 ### 🔧 Technical Implementation
 
 #### Enhanced Data Structure
+
 - Added `noteCount` and `annotationCount` fields to `ZoteroItem` type
 - Real-time content statistics during data extraction
 - Comprehensive logging for transparency
 
 #### Sorting Options
+
 - `totalContent` (default): Combined notes + annotations
 - `noteCount`: Sort by number of notes only
-- `annotationCount`: Sort by number of annotations only  
+- `annotationCount`: Sort by number of annotations only
 - `title`: Alphabetical sorting
 - `dateAdded`: Sort by addition date
 - `none`: Disable sorting
 
 #### Performance Optimized
+
 - Sorting happens after data extraction (no database impact)
 - Content statistics calculated on-demand
 - Fast sorting even for large libraries (>1000 items)
@@ -86,22 +89,25 @@ Top items by content:
 ## 🚀 Usage
 
 ### Quick Start
+
 The plugin now automatically sorts by content richness - no configuration needed!
 
 ### Custom Sorting
+
 ```typescript
 const exportOptions = {
-  sortBy: "noteCount",       // Sort by notes only
-  sortOrder: "desc",         // Richest content first
+  sortBy: "noteCount", // Sort by notes only
+  sortOrder: "desc", // Richest content first
   includeNotes: true,
-  includeAnnotations: true
+  includeAnnotations: true,
 };
 ```
 
 ### Disable Sorting
+
 ```typescript
 const exportOptions = {
-  sortBy: "none"            // Keep original order
+  sortBy: "none", // Keep original order
 };
 ```
 

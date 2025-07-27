@@ -1,6 +1,24 @@
 // Zotero 数据提取器
 
 import { logger } from "../../utils/logger";
+
+// 处理文本：去除所有空格，然后在中英文、数字与中文之间添加空格
+function processTextSpacing(text: string): string {
+  if (!text) return "";
+
+  // 先去除所有空格
+  let processed = text.replace(/\s/g, "");
+
+  // 在中文和英文之间添加空格
+  processed = processed.replace(/([\u4e00-\u9fff])([a-zA-Z])/g, "$1 $2");
+  processed = processed.replace(/([a-zA-Z])([\u4e00-\u9fff])/g, "$1 $2");
+
+  // 在数字和中文之间添加空格
+  processed = processed.replace(/([\u4e00-\u9fff])([0-9])/g, "$1 $2");
+  processed = processed.replace(/([0-9])([\u4e00-\u9fff])/g, "$1 $2");
+
+  return processed;
+}
 import type {
   ZoteroAnnotation,
   ZoteroCreator,
@@ -459,7 +477,7 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
         id: noteItem.id,
         parentItemID: noteItem.parentItemID,
         title: noteItem.getField("title") || "",
-        note: noteItem.getNote() || "",
+        note: processTextSpacing(noteItem.getNote() || ""),
         dateAdded: new Date(noteItem.dateAdded),
         dateModified: new Date(noteItem.dateModified),
       };
@@ -472,8 +490,12 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
   // 提取注释
   private extractAnnotation(annotationItem: any): ZoteroAnnotation | null {
     try {
-      const annotationText = annotationItem.annotationText || "";
-      const annotationComment = annotationItem.annotationComment || "";
+      const annotationText = processTextSpacing(
+        annotationItem.annotationText || "",
+      );
+      const annotationComment = processTextSpacing(
+        annotationItem.annotationComment || "",
+      );
 
       return {
         id: annotationItem.id,
