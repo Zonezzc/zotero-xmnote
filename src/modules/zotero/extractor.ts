@@ -188,6 +188,14 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
         `Got ${attachments.length} attachments for item: ${item.getField("title")}`,
       );
 
+      // 统计笔记和注释数量（用于排序）
+      const noteCount = this.getItemNotes(item.id).length;
+      const annotationCount = this.getItemAnnotations(item.id).length;
+
+      logger.debug(
+        `Item "${item.getField("title")}" has ${noteCount} notes and ${annotationCount} annotations`,
+      );
+
       return {
         id: item.id,
         title: item.getField("title") || "",
@@ -201,6 +209,8 @@ export class ZoteroDataExtractorImpl implements ZoteroDataExtractor {
         collections: this.extractCollections(item),
         attachments: attachments,
         numPages: item.getField("numPages") || undefined,
+        noteCount: noteCount,
+        annotationCount: annotationCount,
         dateAdded: item.dateAdded ? new Date(item.dateAdded) : undefined,
         dateModified: item.dateModified
           ? new Date(item.dateModified)

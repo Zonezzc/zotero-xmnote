@@ -22,6 +22,16 @@ export interface ExportOptions {
   includeAnnotations?: boolean;
   includeMetadata?: boolean;
 
+  // 排序选项
+  sortBy?:
+    | "noteCount"
+    | "annotationCount"
+    | "totalContent"
+    | "title"
+    | "dateAdded"
+    | "none";
+  sortOrder?: "desc" | "asc";
+
   // 处理选项
   batchSize?: number;
   dryRun?: boolean;
@@ -261,8 +271,90 @@ export class DataExporter {
       });
     }
 
-    logger.info(`Extracted ${items.length} items from Zotero`);
+    // 应用排序（默认按笔记数量降序排列）
+    items = this.sortItems(items, options);
+
+    logger.info(`Extracted and sorted ${items.length} items from Zotero`);
     return items;
+  }
+
+  // 对项目进行排序
+  private sortItems(items: ZoteroItem[], options: ExportOptions): ZoteroItem[] {
+    const sortBy = options.sortBy || "totalContent"; // 默认按总内容量排序
+    const sortOrder = options.sortOrder || "desc"; // 默认降序
+
+    if (sortBy === "none") {
+      return items;
+    }
+
+    logger.info(
+      `Sorting ${items.length} items by ${sortBy} in ${sortOrder} order`,
+    );
+
+    const sortedItems = [...items].sort((a, b) => {
+      let compareValue = 0;
+
+      switch (sortBy) {
+        case "noteCount":
+          compareValue = (a.noteCount || 0) - (b.noteCount || 0);
+          break;
+
+        case "annotationCount":
+          compareValue = (a.annotationCount || 0) - (b.annotationCount || 0);
+          break;
+
+        case "totalContent": {
+          // 综合内容量：笔记数 + 注释数
+          const aTotal = (a.noteCount || 0) + (a.annotationCount || 0);
+          const bTotal = (b.noteCount || 0) + (b.annotationCount || 0);
+          compareValue = aTotal - bTotal;
+          break;
+        }
+
+        case "title":
+          compareValue = a.title.localeCompare(b.title);
+          break;
+
+        case "dateAdded":
+          if (!a.dateAdded && !b.dateAdded) compareValue = 0;
+          else if (!a.dateAdded) compareValue = -1;
+          else if (!b.dateAdded) compareValue = 1;
+          else compareValue = a.dateAdded.getTime() - b.dateAdded.getTime();
+          break;
+
+        default:
+          compareValue = 0;
+      }
+
+      // 应用排序顺序
+      return sortOrder === "desc" ? -compareValue : compareValue;
+    });
+
+    // 记录排序结果的一些统计信息
+    if (sortedItems.length > 0) {
+      const first = sortedItems[0];
+      const last = sortedItems[sortedItems.length - 1];
+
+      logger.info(
+        `Sorting completed. First item: "${first.title}" (${first.noteCount || 0} notes, ${first.annotationCount || 0} annotations)`,
+      );
+      logger.info(
+        `Last item: "${last.title}" (${last.noteCount || 0} notes, ${last.annotationCount || 0} annotations)`,
+      );
+
+      // 显示内容丰富的前5个项目
+      const topItems = sortedItems.slice(0, Math.min(5, sortedItems.length));
+      logger.info("Top items by content:");
+      topItems.forEach((item, index) => {
+        const totalContent =
+          (item.noteCount || 0) + (item.annotationCount || 0);
+        logger.info(
+          `  ${index + 1}. "${item.title}": ${totalContent} total (${item.noteCount || 0} notes + ${item.annotationCount || 0} annotations)`,
+        );
+      });
+    }
+
+    return sortedItems;
   }
 
   // 转换数据

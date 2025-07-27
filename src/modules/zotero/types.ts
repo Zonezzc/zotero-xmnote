@@ -15,6 +15,8 @@ export interface ZoteroItem {
   dateModified?: Date;
   attachments?: ZoteroAttachment[];
   numPages?: number;
+  noteCount?: number; // 笔记数量统计
+  annotationCount?: number; // 注释数量统计
 }
 
 export interface ZoteroAttachment {
