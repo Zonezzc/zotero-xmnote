@@ -14,6 +14,14 @@ import type { XMnoteEntry, XMnoteNote } from "../xmnote/types";
 import type { ValidationResult } from "../config/types";
 
 export class DataTransformerImpl implements DataTransformer {
+  // 将日期转换为本地时区时间戳
+  private toLocalTimestamp(date: Date): number {
+    // 如果Zotero的dateAdded是UTC时间，我们需要转换为本地时间
+    // 假设用户在中国时区（UTC+8），需要加8小时
+    const localTime = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+    logger.debug(`Original time: ${date.toISOString()}, Local time: ${localTime.toISOString()}, Timestamp: ${Math.floor(localTime.getTime() / 1000)}`);
+    return Math.floor(localTime.getTime() / 1000);
+  }
   // 转换单个Zotero条目到XMnote格式
   transformItem(
     item: ZoteroItem,
@@ -413,7 +421,7 @@ export class DataTransformerImpl implements DataTransformer {
     for (const note of notes) {
       const entry: XMnoteEntry = {
         note: this.cleanHtmlContent(note.note),
-        time: Math.floor(note.dateAdded.getTime() / 1000),
+        time: this.toLocalTimestamp(note.dateAdded),
       };
 
       // 如果笔记有标题且与内容不同，将标题作为章节
@@ -427,7 +435,7 @@ export class DataTransformerImpl implements DataTransformer {
     // 转换注释
     for (const annotation of annotations) {
       const entry: XMnoteEntry = {
-        time: Math.floor(annotation.dateAdded.getTime() / 1000),
+        time: this.toLocalTimestamp(annotation.dateAdded),
       };
 
       // 页码信息
