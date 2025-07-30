@@ -33,7 +33,7 @@
 
 ### 方法二：直接下载
 
-- **直接链接**: [下载 v1.0.0](https://github.com/Zonezzc/zotero-xmnote/releases/download/v1.0.0/zotero-xmnote-plugin.xpi)
+- **直接链接**: [下载 v1.4.1](https://github.com/Zonezzc/zotero-xmnote/releases/download/v1.4.1/zotero-xmnote-plugin.xpi)
 - **文件大小**: 54KB
 - **SHA256**: `336dedda19d30e72c731c5c0bb661c613309416bcbb08bc386ce4f41458f243e`
 

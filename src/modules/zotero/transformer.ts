@@ -19,7 +19,9 @@ export class DataTransformerImpl implements DataTransformer {
     // 如果Zotero的dateAdded是UTC时间，我们需要转换为本地时间
     // 假设用户在中国时区（UTC+8），需要加8小时
     const localTime = new Date(date.getTime() + 8 * 60 * 60 * 1000);
-    logger.debug(`Original time: ${date.toISOString()}, Local time: ${localTime.toISOString()}, Timestamp: ${Math.floor(localTime.getTime() / 1000)}`);
+    logger.debug(
+      `Original time: ${date.toISOString()}, Local time: ${localTime.toISOString()}, Timestamp: ${Math.floor(localTime.getTime() / 1000)}`,
+    );
     return Math.floor(localTime.getTime() / 1000);
   }
   // 转换单个Zotero条目到XMnote格式
@@ -373,7 +375,7 @@ export class DataTransformerImpl implements DataTransformer {
       // 尝试解析日期
       const publishDate = this.parseDate(item.date);
       if (publishDate) {
-        xmnoteNote.publishDate = Math.floor(publishDate.getTime() / 1000);
+        xmnoteNote.publishDate = this.toLocalTimestamp(publishDate);
       }
     }
 
@@ -404,8 +406,8 @@ export class DataTransformerImpl implements DataTransformer {
     xmnoteNote.readingStatus = 2;
 
     if (item.dateAdded) {
-      xmnoteNote.readingStatusChangedDate = Math.floor(
-        item.dateAdded.getTime() / 1000,
+      xmnoteNote.readingStatusChangedDate = this.toLocalTimestamp(
+        item.dateAdded,
       );
     }
   }
