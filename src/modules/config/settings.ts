@@ -317,7 +317,7 @@ export class ConfigManager {
     if (!config.xmnoteServer.ip) {
       errors.push("XMnote server IP is required");
     } else if (!this.isValidIP(config.xmnoteServer.ip)) {
-      errors.push("Invalid IP address format");
+      errors.push("Invalid IP address or domain name format");
     }
 
     if (
@@ -430,18 +430,32 @@ export class ConfigManager {
     logger.info("Configuration reset to defaults");
   }
 
-  // 验证IP地址格式
+  // 验证IP地址或域名格式
   private isValidIP(ip: string): boolean {
+    // 检查是否为有效的IPv4地址
     const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-    if (!ipRegex.test(ip)) {
-      return false;
+    if (ipRegex.test(ip)) {
+      const parts = ip.split(".");
+      return parts.every((part) => {
+        const num = parseInt(part, 10);
+        return num >= 0 && num <= 255;
+      });
     }
 
-    const parts = ip.split(".");
-    return parts.every((part) => {
-      const num = parseInt(part, 10);
-      return num >= 0 && num <= 255;
-    });
+    // 检查是否为有效的域名格式
+    const domainRegex =
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    if (domainRegex.test(ip)) {
+      // 额外检查：域名不能以点开头或结尾，不能有连续的点
+      return !ip.startsWith(".") && !ip.endsWith(".") && !ip.includes("..");
+    }
+
+    // 检查特殊域名 localhost
+    if (ip === "localhost") {
+      return true;
+    }
+
+    return false;
   }
 }
 
