@@ -87,7 +87,7 @@ export class DataTransformerImpl implements DataTransformer {
           input.item,
           filteredNotes,
           filteredAnnotations,
-          option,
+          options,
         );
 
         results.push(transformedNote);

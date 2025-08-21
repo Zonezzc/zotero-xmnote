@@ -224,32 +224,32 @@ function loadCurrentConfig(window: Window) {
     setCheckboxValue(
       doc,
       "xmnote-reading-duration-enabled",
-      config.importOptions.readingDuration.enable,
+      config.importOptions.readingDuration.enabled,
     );
     setInputValue(
       doc,
       "xmnote-reading-duration-max-session-gap",
-      config.importOptions.readingDuration.maxSessionGap.toString(,
+      config.importOptions.readingDuration.maxSessionGap.toString(),
     );
     setInputValue(
       doc,
       "xmnote-reading-duration-min-session-duration",
-      config.importOptions.readingDuration.minSessionDuration.toString(,
+      config.importOptions.readingDuration.minSessionDuration.toString(),
     );
     setInputValue(
       doc,
       "xmnote-reading-duration-max-session-duration",
-      config.importOptions.readingDuration.maxSessionDuration.toString(,
+      config.importOptions.readingDuration.maxSessionDuration.toString(),
     );
     setInputValue(
       doc,
       "xmnote-reading-duration-single-note-estimate",
-      config.importOptions.readingDuration.singleNoteEstimate.toString(,
+      config.importOptions.readingDuration.singleNoteEstimate.toString(),
     );
     setInputValue(
       doc,
       "xmnote-reading-duration-reading-speed-factor",
-      config.importOptions.readingDuration.readingSpeedFactor.toString(,
+      config.importOptions.readingDuration.readingSpeedFactor.toString(),
     );
 
     // UI配置

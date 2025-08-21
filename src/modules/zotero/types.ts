@@ -108,7 +108,7 @@ export interface DataTransformer {
   // 批量转换
   transformItems(
     items: TransformInput[],
-    options?: { includeReadingDuration?: boolean ,
+    options?: { includeReadingDuration?: boolean },
   ): import("../xmnote/types").XMnoteNote[];
 
   // 验证转换结果
