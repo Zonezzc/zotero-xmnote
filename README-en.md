@@ -55,28 +55,28 @@ A powerful Zotero plugin that seamlessly integrates with XMnote server for effic
 ### Server Settings
 
 | Setting          | Description                        | Default         | Range       |
-|------------------|------------------------------------|-----------------|-------------|
+| ---------------- | ---------------------------------- | --------------- | ----------- |
 | **IP Address**   | XMnote server IP address           | `192.168.1.100` | Valid IP    |
 | **Port**         | XMnote server port                 | `8080`          | 1-65535     |
 | **Timeout (ms)** | Connection timeout in milliseconds | `30000`         | 1000-300000 |
 
 ### Import Options
 
-| Option                  | Description            | Default   |
-|-------------------------|------------------------|-----------|
+| Option                  | Description            | Default    |
+| ----------------------- | ---------------------- | ---------- |
 | **Include Notes**       | Export item notes      | ✅ Enabled |
 | **Include Annotations** | Export PDF annotations | ✅ Enabled |
 | **Include Metadata**    | Export item metadata   | ✅ Enabled |
-| **Batch Size**          | Items per batch        | `10`      |
-| **Retry Count**         | Failed request retries | `3`       |
+| **Batch Size**          | Items per batch        | `10`       |
+| **Retry Count**         | Failed request retries | `3`        |
 
 ### Connection Testing
 
 1. After configuring server settings, click **Test Connection**
 2. The status indicator will show:
-    - 🟢 **Connected**: Server is accessible
-    - 🔴 **Failed**: Connection failed (check settings)
-    - 🟡 **Testing**: Connection in progress
+   - 🟢 **Connected**: Server is accessible
+   - 🔴 **Failed**: Connection failed (check settings)
+   - 🟡 **Testing**: Connection in progress
 
 ## 🚀 Usage
 
