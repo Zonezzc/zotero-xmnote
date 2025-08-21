@@ -32,7 +32,8 @@
       "Bash(timeout 10 npm run release)",
       "Bash(git revert:*)",
       "Bash(gh run list:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }

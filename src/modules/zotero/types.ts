@@ -102,11 +102,13 @@ export interface DataTransformer {
     item: ZoteroItem,
     notes: ZoteroNote[],
     annotations: ZoteroAnnotation[],
+    options?: { includeReadingDuration?: boolean },
   ): import("../xmnote/types").XMnoteNote;
 
   // 批量转换
   transformItems(
     items: TransformInput[],
+    options?: { includeReadingDuration?: boolean ,
   ): import("../xmnote/types").XMnoteNote[];
 
   // 验证转换结果

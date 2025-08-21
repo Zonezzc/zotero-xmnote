@@ -2,13 +2,7 @@
 
 import { config as packageConfig } from "../../../package.json";
 import { logger } from "../../utils/logger";
-import type {
-  ImportOptions,
-  PluginConfig,
-  UIConfig,
-  ValidationResult,
-  XMnoteConfig,
-} from "./types";
+import type { ImportOptions, PluginConfig, UIConfig, XMnoteConfig } from "./types";
 
 export class ConfigManager {
   private static instance: ConfigManager;
@@ -34,6 +28,7 @@ export class ConfigManager {
         includeAnnotations: true,
         includeMetadata: true,
         includeCurrentPage: true, // 默认包含当前页数（智能检测）
+        includeReadingDuration: true, // 默认启用阅读时长估算
         punctuationOptions: {
           comma: false,
           period: false,
@@ -46,6 +41,14 @@ export class ConfigManager {
           braces: false,
           doubleQuotes: false,
           singleQuotes: false,
+        },
+        readingDuration: {
+          enabled: true,
+          maxSessionGap: 1800, // 30分钟间隔
+          minSessionDuration: 600, // 最少10分钟
+          maxSessionDuration: 14400, // 最多4小时
+          singleNoteEstimate: 600, // 单笔记10分钟
+          readingSpeedFactor: 1.2, // 阅读速度因子
         },
         batchSize: 10,
         retryCount: 3,
@@ -104,6 +107,10 @@ export class ConfigManager {
             (Zotero.Prefs.get(
               `${prefPrefix}.xmnote.import.includeCurrentPage`,
             ) as boolean) ?? defaultConfig.importOptions.includeCurrentPage,
+          includeReadingDuration:
+            (Zotero.Prefs.get(
+              `${prefPrefix}.xmnote.import.includeReadingDuration,
+            ) as boolean) ?? defaultConfig.importOptions.includeReadingDuration,
           punctuationOptions: {
             comma:
               (Zotero.Prefs.get(
@@ -173,6 +180,38 @@ export class ConfigManager {
             (Zotero.Prefs.get(
               `${prefPrefix}.xmnote.import.timeoutMs`,
             ) as number) || defaultConfig.importOptions.timeoutMs,
+          readingDuration: {
+            enabled:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.readingDuration.enabled`,
+              ) as boolean) ??
+              defaultConfig.importOptions.readingDuration.enabled,
+            maxSessionGap:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.readingDuration.maxSessionGap`,
+              ) as number) ||
+              defaultConfig.importOptions.readingDuration.maxSessionGap,
+            minSessionDuration:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.readingDuration.minSessionDuration`,
+              ) as number) ||
+              defaultConfig.importOptions.readingDuration.minSessionDuration,
+            maxSessionDuration:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.readingDuration.maxSessionDuration`,
+              ) as number) ||
+              defaultConfig.importOptions.readingDuration.maxSessionDuration,
+            singleNoteEstimate:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.readingDuration.singleNoteEstimate`,
+              ) as number) ||
+              defaultConfig.importOptions.readingDuration.singleNoteEstimate,
+            readingSpeedFactor:
+              (Zotero.Prefs.get(
+                `${prefPrefix}.xmnote.readingDuration.readingSpeedFactor`,
+              ) as number) ||
+              defaultConfig.importOptions.readingDuration.readingSpeedFactor,
+          },
         },
         ui: {
           showProgress:
@@ -231,6 +270,10 @@ export class ConfigManager {
         `${prefPrefix}.xmnote.import.includeCurrentPage`,
         config.importOptions.includeCurrentPage,
       );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.import.includeReadingDuration`,
+        config.importOptions.includeReadingDuration,
+      );
 
       // 保存标点符号选项
       Zotero.Prefs.set(
@@ -288,6 +331,32 @@ export class ConfigManager {
       Zotero.Prefs.set(
         `${prefPrefix}.xmnote.import.timeoutMs`,
         config.importOptions.timeoutMs,
+      );
+
+      // 保存阅读时长配置
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.readingDuration.enabled`,
+        config.importOptions.readingDuration.enabled,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.readingDuration.maxSessionGap`,
+        config.importOptions.readingDuration.maxSessionGap,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.readingDuration.minSessionDuration`,
+        config.importOptions.readingDuration.minSessionDuration,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.readingDuration.maxSessionDuration`,
+        config.importOptions.readingDuration.maxSessionDuration,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.readingDuration.singleNoteEstimate`,
+        config.importOptions.readingDuration.singleNoteEstimate,
+      );
+      Zotero.Prefs.set(
+        `${prefPrefix}.xmnote.readingDuration.readingSpeedFactor`,
+        config.importOptions.readingDuration.readingSpeedFactor,
       );
 
       Zotero.Prefs.set(

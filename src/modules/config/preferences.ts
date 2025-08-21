@@ -3,12 +3,7 @@
 import { configManager } from "./settings";
 import { getXMnoteApiClient } from "../xmnote/api";
 import { logger } from "../../utils/logger";
-import type {
-  ImportOptions,
-  PluginConfig,
-  UIConfig,
-  XMnoteConfig,
-} from "./types";
+import type { ImportOptions, PluginConfig, UIConfig, XMnoteConfig } from "./types";
 
 export function registerPrefsScripts(window: Window) {
   // 初始化首选项界面
@@ -37,6 +32,7 @@ function initializePrefsUI(window: Window) {
     "xmnote-include-annotations",
     "xmnote-include-metadata",
     "xmnote-include-current-page",
+    "xmnote-include-reading-duration",
     "xmnote-punctuation-comma",
     "xmnote-punctuation-period",
     "xmnote-punctuation-question-mark",
@@ -48,6 +44,12 @@ function initializePrefsUI(window: Window) {
     "xmnote-punctuation-braces",
     "xmnote-punctuation-double-quotes",
     "xmnote-punctuation-single-quotes",
+    "xmnote-reading-duration-enabled",
+    "xmnote-reading-duration-max-session-gap",
+    "xmnote-reading-duration-min-session-duration",
+    "xmnote-reading-duration-max-session-duration",
+    "xmnote-reading-duration-single-note-estimate",
+    "xmnote-reading-duration-reading-speed-factor",
     "xmnote-batch-size",
     "xmnote-retry-count",
     "xmnote-show-progress",
@@ -145,6 +147,11 @@ function loadCurrentConfig(window: Window) {
       "xmnote-include-current-page",
       config.importOptions.includeCurrentPage,
     );
+    setCheckboxValue(
+      doc,
+      "xmnote-include-reading-duration",
+      config.importOptions.includeReadingDuration,
+    );
 
     // 标点符号替换选项
     setCheckboxValue(
@@ -211,6 +218,38 @@ function loadCurrentConfig(window: Window) {
       doc,
       "xmnote-retry-count",
       config.importOptions.retryCount.toString(),
+    );
+
+    // 阅读时长配置
+    setCheckboxValue(
+      doc,
+      "xmnote-reading-duration-enabled",
+      config.importOptions.readingDuration.enable,
+    );
+    setInputValue(
+      doc,
+      "xmnote-reading-duration-max-session-gap",
+      config.importOptions.readingDuration.maxSessionGap.toString(,
+    );
+    setInputValue(
+      doc,
+      "xmnote-reading-duration-min-session-duration",
+      config.importOptions.readingDuration.minSessionDuration.toString(,
+    );
+    setInputValue(
+      doc,
+      "xmnote-reading-duration-max-session-duration",
+      config.importOptions.readingDuration.maxSessionDuration.toString(,
+    );
+    setInputValue(
+      doc,
+      "xmnote-reading-duration-single-note-estimate",
+      config.importOptions.readingDuration.singleNoteEstimate.toString(,
+    );
+    setInputValue(
+      doc,
+      "xmnote-reading-duration-reading-speed-factor",
+      config.importOptions.readingDuration.readingSpeedFactor.toString(,
     );
 
     // UI配置
@@ -366,6 +405,10 @@ function getConfigFromUI(window: Window): PluginConfig | null {
       includeAnnotations: getCheckboxValue(doc, "xmnote-include-annotations"),
       includeMetadata: getCheckboxValue(doc, "xmnote-include-metadata"),
       includeCurrentPage: getCheckboxValue(doc, "xmnote-include-current-page"),
+      includeReadingDuration: getCheckboxValue(
+        doc,
+        "xmnote-include-reading-duration"
+      ),
       punctuationOptions: {
         comma: getCheckboxValue(doc, "xmnote-punctuation-comma"),
         period: getCheckboxValue(doc, "xmnote-punctuation-period"),
@@ -381,6 +424,29 @@ function getConfigFromUI(window: Window): PluginConfig | null {
         braces: getCheckboxValue(doc, "xmnote-punctuation-braces"),
         doubleQuotes: getCheckboxValue(doc, "xmnote-punctuation-double-quotes"),
         singleQuotes: getCheckboxValue(doc, "xmnote-punctuation-single-quotes"),
+      },
+      readingDuration: {
+        enabled: getCheckboxValue(doc, "xmnote-reading-duration-enabled"),
+        maxSessionGap: parseInt(
+          getInputValue(doc, "xmnote-reading-duration-max-session-gap") ||
+          "1800"
+        ),
+        minSessionDuration: parseInt(
+          getInputValue(doc, "xmnote-reading-duration-min-session-duration") ||
+          "600"
+        ),
+        maxSessionDuration: parseInt(
+          getInputValue(doc, "xmnote-reading-duration-max-session-duration") ||
+          "14400"
+        ),
+        singleNoteEstimate: parseInt(
+          getInputValue(doc, "xmnote-reading-duration-single-note-estimate") ||
+          "600"
+        ),
+        readingSpeedFactor: parseFloat(
+          getInputValue(doc, "xmnote-reading-duration-reading-speed-factor") ||
+          "1.2"
+        )
       },
       batchSize: parseInt(getInputValue(doc, "xmnote-batch-size") || "10"),
       retryCount: parseInt(getInputValue(doc, "xmnote-retry-count") || "3"),

@@ -20,15 +20,26 @@ export interface PunctuationOptions {
   singleQuotes: boolean; // '' → ''
 }
 
+export interface ReadingDurationConfig {
+  enabled: boolean;
+  maxSessionGap: number; // 最大会话间隔（秒）
+  minSessionDuration: number; // 最小会话时长（秒）
+  maxSessionDuration: number; // 最大会话时长（秒）
+  singleNoteEstimate: number; // 单笔记估算时长（秒）
+  readingSpeedFactor: number; // 阅读速度因子
+}
+
 export interface ImportOptions {
   includeNotes: boolean;
   includeAnnotations: boolean;
   includeMetadata: boolean;
   includeCurrentPage: boolean;
+  includeReadingDuration: boolean;
   batchSize: number;
   retryCount: number;
   timeoutMs: number;
   punctuationOptions: PunctuationOptions;
+  readingDuration: ReadingDurationConfig;
 }
 
 export interface UIConfig {

@@ -417,6 +417,7 @@ export class ExportDialog {
           includeNotes: true,
           includeAnnotations: true,
           includeMetadata: true,
+          includeReadingDuration: true, // 启用阅读时长估算
           batchSize: 10,
           onProgress: (progress: any) => {
             const progressPercent =

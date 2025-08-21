@@ -3,6 +3,7 @@
 import { logger } from "../../utils/logger";
 import { configManager } from "../config/settings";
 import { getXMnoteApiClient } from "../xmnote/api";
+import { ReadingDurationEstimator } from "../reading/duration-estimator";
 import type {
   DataTransformer,
   TransformInput,
@@ -16,19 +17,20 @@ import type { ValidationResult } from "../config/types";
 export class DataTransformerImpl implements DataTransformer {
   // 将日期转换为本地时区时间戳
   private toLocalTimestamp(date: Date): number {
-    // 如果Zotero的dateAdded是UTC时间，我们需要转换为本地时间
-    // 假设用户在中国时区（UTC+8），需要加8小时
-    const localTime = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+    // 直接使用 Zotero 提供的时间，不做额外的时区转换
+    // Zotero 内部处理时区，我们直接使用原始时间戳
+    const timestamp = Math.floor(date.getTime() / 1000);
     logger.debug(
-      `Original time: ${date.toISOString()}, Local time: ${localTime.toISOString()}, Timestamp: ${Math.floor(localTime.getTime() / 1000)}`,
+      `Original time: ${date.toISOString()}, Timestamp: ${timestamp}`,
     );
-    return Math.floor(localTime.getTime() / 1000);
+    return timestamp;
   }
   // 转换单个Zotero条目到XMnote格式
   transformItem(
     item: ZoteroItem,
     notes: ZoteroNote[],
     annotations: ZoteroAnnotation[],
+    options?: { includeReadingDuration?: boolean },
   ): XMnoteNote {
     logger.debug(`Transforming item: ${item.title}`);
 
@@ -54,6 +56,9 @@ export class DataTransformerImpl implements DataTransformer {
       xmnoteNote.entries = entries;
     }
 
+    // 阅读时长估算
+    this.addReadingDurationEstimation(entries, xmnoteNote, options);
+
     logger.debug(
       `Transformed item ${item.title} with ${entries.length} entries`,
     );
@@ -61,7 +66,10 @@ export class DataTransformerImpl implements DataTransformer {
   }
 
   // 批量转换
-  transformItems(items: TransformInput[]): XMnoteNote[] {
+  transformItems(
+    items: TransformInput[],
+    options?: { includeReadingDuration?: boolean },
+  ): XMnoteNote[] {
     logger.info(`Starting batch transformation of ${items.length} items`);
 
     const results: XMnoteNote[] = [];
@@ -79,6 +87,7 @@ export class DataTransformerImpl implements DataTransformer {
           input.item,
           filteredNotes,
           filteredAnnotations,
+          option,
         );
 
         results.push(transformedNote);
@@ -541,6 +550,69 @@ export class DataTransformerImpl implements DataTransformer {
     } catch (error) {
       logger.warn(`Failed to parse date: ${dateString}`, error);
       return null;
+    }
+  }
+
+  // 添加阅读时长估算
+  private addReadingDurationEstimation(
+    entries: XMnoteEntry[],
+    xmnoteNote: XMnoteNote,
+    options?: { includeReadingDuration?: boolean },
+  ): void {
+    const config = configManager.getImportOptions();
+
+    // 优先使用传入的选项，否则使用全局配置
+    const shouldIncludeReading =
+      options?.includeReadingDuration ?? config.includeReadingDuration;
+
+    logger.info(
+      `Reading duration config check: shouldIncludeReading=${shouldIncludeReading}, enabled=${config.readingDuration?.enabled}`,
+    );
+
+    // 如果明确从选项中传递了 includeReadingDuration: true，则强制启用
+    const forceEnable = options?.includeReadingDuration === true;
+    const configEnabled = config.readingDuration?.enabled === true;
+
+    if (!shouldIncludeReading || (!forceEnable && !configEnabled)) {
+      logger.warn(
+        `Reading duration estimation is disabled: shouldInclude=${shouldIncludeReading}, forceEnable=${forceEnable}, configEnabled=${configEnabled}`,
+      );
+      return;
+    }
+
+    logger.info("Reading duration estimation is enabled, proceeding...");
+
+    if (!entries || entries.length === 0) {
+      logger.debug("No entries found, skipping reading duration estimation");
+      return;
+    }
+
+    try {
+      // 创建阅读时长估算器 - 使用当前配置管理器设置
+      const readingDurationConfig =
+        configManager.getConfig().importOptions.readingDuration;
+      const estimator = new ReadingDurationEstimator({
+        maxSessionGap: readingDurationConfig.maxSessionGap,
+        minSessionDuration: readingDurationConfig.minSessionDuration,
+        maxSessionDuration: readingDurationConfig.maxSessionDuration,
+        singleNoteEstimate: readingDurationConfig.singleNoteEstimate,
+        readingSpeedFactor: readingDurationConfig.readingSpeedFactor,
+      });
+
+      // 估算阅读时长
+      const result = estimator.estimateFromNotes(entries);
+
+      // 添加到XMnote数据
+      if (result.preciseReadingDurations.length > 0) {
+        xmnoteNote.preciseReadingDurations = result.preciseReadingDurations;
+      }
+
+      logger.info(
+        `Reading duration estimation completed: ${result.sessions.length} sessions, ` +
+          `${Math.round(result.totalReadingTime / 60)} minutes total reading time`,
+      );
+    } catch (error) {
+      logger.error("Failed to estimate reading duration:", error);
     }
   }
 

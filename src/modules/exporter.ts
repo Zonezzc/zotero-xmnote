@@ -21,6 +21,7 @@ export interface ExportOptions {
   includeNotes?: boolean;
   includeAnnotations?: boolean;
   includeMetadata?: boolean;
+  includeReadingDuration?: boolean;
 
   // 排序选项
   sortBy?:
@@ -396,7 +397,9 @@ export class DataExporter {
       }
     }
 
-    const xmnoteNotes = this.transformer.transformItems(transformInputs);
+    const xmnoteNotes = this.transformer.transformItems(transformInputs, {
+      includeReadingDuration: options.includeReadingDuration,
+    });
     logger.info(`Transformed ${xmnoteNotes.length} items successfully`);
 
     return xmnoteNotes;
