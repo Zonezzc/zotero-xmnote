@@ -120,15 +120,15 @@ npm run lint:check
 
 ## 工具命令参考
 
-| 命令                              | 作用             |
-|---------------------------------|----------------|
-| `gh run list`                   | 列出workflow运行记录 |
-| `gh run view <id>`              | 查看运行详情         |
-| `gh run view <id> --log-failed` | 查看失败日志         |
-| `npm run lint:check`            | 检查代码格式和规范      |
-| `npm run lint:fix`              | 自动修复格式和规范问题    |
-| `npm run build`                 | 本地构建测试         |
-| `npm test`                      | 运行测试           |
+| 命令                            | 作用                   |
+| ------------------------------- | ---------------------- |
+| `gh run list`                   | 列出workflow运行记录   |
+| `gh run view <id>`              | 查看运行详情           |
+| `gh run view <id> --log-failed` | 查看失败日志           |
+| `npm run lint:check`            | 检查代码格式和规范     |
+| `npm run lint:fix`              | 自动修复格式和规范问题 |
+| `npm run build`                 | 本地构建测试           |
+| `npm test`                      | 运行测试               |
 
 ## 注意事项
 
