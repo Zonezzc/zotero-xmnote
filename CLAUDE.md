@@ -94,3 +94,11 @@ NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (\*.md) or README files. Only create documentation files if explicitly
 requested by the User.
+
+## CI/CD Issues Resolution
+
+When GitHub Actions CI fails due to lint or code style issues:
+
+1. **Code Style Failures**: Run `npm run lint:fix` to automatically fix Prettier formatting and ESLint issues
+2. **Commit and Push**: After fixing, commit changes and push to trigger CI re-run
+3. **Common Cause**: Prettier formatting inconsistencies in TypeScript files and documentation
