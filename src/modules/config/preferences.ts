@@ -3,7 +3,12 @@
 import { configManager } from "./settings";
 import { getXMnoteApiClient } from "../xmnote/api";
 import { logger } from "../../utils/logger";
-import type { ImportOptions, PluginConfig, UIConfig, XMnoteConfig } from "./types";
+import type {
+  ImportOptions,
+  PluginConfig,
+  UIConfig,
+  XMnoteConfig,
+} from "./types";
 
 export function registerPrefsScripts(window: Window) {
   // 初始化首选项界面
@@ -407,7 +412,7 @@ function getConfigFromUI(window: Window): PluginConfig | null {
       includeCurrentPage: getCheckboxValue(doc, "xmnote-include-current-page"),
       includeReadingDuration: getCheckboxValue(
         doc,
-        "xmnote-include-reading-duration"
+        "xmnote-include-reading-duration",
       ),
       punctuationOptions: {
         comma: getCheckboxValue(doc, "xmnote-punctuation-comma"),
@@ -429,24 +434,24 @@ function getConfigFromUI(window: Window): PluginConfig | null {
         enabled: getCheckboxValue(doc, "xmnote-reading-duration-enabled"),
         maxSessionGap: parseInt(
           getInputValue(doc, "xmnote-reading-duration-max-session-gap") ||
-          "1800"
+            "1800",
         ),
         minSessionDuration: parseInt(
           getInputValue(doc, "xmnote-reading-duration-min-session-duration") ||
-          "600"
+            "600",
         ),
         maxSessionDuration: parseInt(
           getInputValue(doc, "xmnote-reading-duration-max-session-duration") ||
-          "14400"
+            "14400",
         ),
         singleNoteEstimate: parseInt(
           getInputValue(doc, "xmnote-reading-duration-single-note-estimate") ||
-          "600"
+            "600",
         ),
         readingSpeedFactor: parseFloat(
           getInputValue(doc, "xmnote-reading-duration-reading-speed-factor") ||
-          "1.2"
-        )
+            "1.2",
+        ),
       },
       batchSize: parseInt(getInputValue(doc, "xmnote-batch-size") || "10"),
       retryCount: parseInt(getInputValue(doc, "xmnote-retry-count") || "3"),

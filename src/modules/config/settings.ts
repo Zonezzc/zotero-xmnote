@@ -2,7 +2,13 @@
 
 import { config as packageConfig } from "../../../package.json";
 import { logger } from "../../utils/logger";
-import type { ImportOptions, PluginConfig, UIConfig, ValidationResult, XMnoteConfig } from "./types";
+import type {
+  ImportOptions,
+  PluginConfig,
+  UIConfig,
+  ValidationResult,
+  XMnoteConfig,
+} from "./types";
 
 export class ConfigManager {
   private static instance: ConfigManager;
