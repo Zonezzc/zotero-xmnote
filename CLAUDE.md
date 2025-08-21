@@ -49,6 +49,7 @@ The plugin follows a modular event-driven architecture:
 - `src/modules/ui/` - User interface components (menus, dialogs, context menus, item selection)
 - `src/modules/xmnote/` - XMnote API client and types
 - `src/modules/zotero/` - Zotero data extraction and transformation
+- `src/modules/reading/` - Reading duration estimation with configurable parameters
 - `src/modules/exporter.ts` - Data export orchestration
 - `src/utils/` - Core utilities (locale, logger, network, ztoolkit)
 
@@ -63,25 +64,38 @@ The plugin follows a modular event-driven architecture:
 
 ### Configuration
 
-- Plugin metadata defined in `package.json` config section (addonName, addonID, addonRef, etc.)
-- Build configuration in `zotero-plugin.config.ts` using zotero-plugin-scaffold
-- TypeScript configuration targets Firefox 115
-- Multi-language support via locale files in `addon/locale/`
-- Server settings stored in Zotero preferences with real-time validation
+- **Plugin Metadata**: Defined in `package.json` config section (addonName, addonID, addonRef, etc.)
+- **Build System**: ESBuild configuration in `zotero-plugin.config.ts` targeting Firefox 115
+  - Entry point: `src/index.ts`
+  - Output: `.scaffold/build/addon/content/scripts/`
+  - Assets copied from `addon/**/*.*`
+- **TypeScript**: `tsconfig.json` extends `zotero-types/entries/sandbox/`
+- **Code Quality**: ESLint uses `@zotero-plugin/eslint-config`, Prettier embedded in package.json
+- **Localization**: Multi-language support via locale files in `addon/locale/`
+- **Settings**: Server settings stored in Zotero preferences with real-time validation through `configManager`
 
 ### Key Integration Patterns
 
 - **Singleton Pattern**: MenuHandler and ErrorHandler use singleton instances
-- **Factory Pattern**: API clients and data transformers created via factory functions
+- **Factory Pattern**: API clients and data transformers created via factory functions (`getDataExporter`,
+  `getXMnoteApiClient`)
 - **Event-Driven**: All UI interactions flow through the hook system
+- **Centralized API Access**: All major APIs exposed through `addon.api` object
+- **Global Variables**: Plugin registers global variables: `_globalThis`, `ztoolkit`, `addon`, `rootURI`, `__env__`
 - **Async Operations**: Export operations use async/await with progress callbacks
 - **Error Handling**: Centralized logging with user-visible notifications
 
 ### Development Environment
 
-- Requires beta version of Zotero for development
-- Uses `.env` file for Zotero binary path and profile configuration
-- Environment variables: `NODE_ENV` determines development vs production behavior
+- **Node.js Version**: Requires Node.js 20 (as specified in CI workflows)
+- **Package Manager**: Supports both npm and pnpm (pnpm-lock.yaml present)
+- **Zotero Requirements**: Requires beta version of Zotero for development
+- **Environment Configuration**: Create `.env` file with required variables:
+  - `ZOTERO_PLUGIN_ZOTERO_BIN_PATH` - Path to Zotero binary
+  - `ZOTERO_PLUGIN_PROFILE_PATH` - Development profile path
+  - `ZOTERO_PLUGIN_DATA_DIR` - Data directory
+  - `GITHUB_TOKEN` - Optional, for local releases
+- **Environment variables**: `NODE_ENV` determines development vs production behavior
 
 ## Testing
 
@@ -95,7 +109,15 @@ ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (\*.md) or README files. Only create documentation files if explicitly
 requested by the User.
 
-## CI/CD Issues Resolution
+## CI/CD and Automation
+
+### GitHub Actions Workflows
+
+- **CI Pipeline**: Separate jobs for lint, build, and test on Node.js 20
+- **Release Automation**: Tag-triggered releases with artifact uploads and GitHub release creation
+- **Dependency Management**: Dependabot weekly updates with grouped non-major updates, plus Renovate integration
+
+### CI/CD Issues Resolution
 
 When GitHub Actions CI fails due to lint or code style issues:
 
