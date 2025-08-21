@@ -1,183 +1,209 @@
-# Zotero XMnote Plugin
+# Zotero XMnote 插件
 
 [![zotero target version](https://img.shields.io/badge/Zotero-7-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Zonezzc/zotero-xmnote?style=flat-square)](https://github.com/Zonezzc/zotero-xmnote/releases)
 [![GitHub](https://img.shields.io/github/license/Zonezzc/zotero-xmnote?style=flat-square)](https://github.com/Zonezzc/zotero-xmnote/blob/main/LICENSE)
 [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
 
-A powerful Zotero plugin that seamlessly integrates with XMnote server for efficient data export and synchronization.
+一个强大的 Zotero 插件，与 XMnote 服务器无缝集成，实现高效的数据导出和同步。
 
-**Languages**: [English](README.md) | [简体中文](README-zh.md)
+**语言版本**: [English](README-en.md) | [简体中文](README.md)
 
-## ✨ Features
+## ✨ 功能特性
 
-- 🔗 **XMnote Integration**: Connect Zotero with XMnote server for seamless data export
-- 📤 **Flexible Export Options**: Export all items or selected items with customizable settings
-- ⚙️ **Configurable Server Settings**: Easy setup with IP, port, timeout, and other configurations
-- 🖱️ **Context Menu Support**: Quick access through right-click menus on collections and items
-- 🌍 **Multi-language Support**: Interface available in English and Chinese (Simplified)
-- 🎛️ **User-friendly Preferences**: Intuitive configuration panel with real-time connection testing
-- 📊 **Batch Processing**: Configurable batch size and retry mechanisms for large datasets
-- 🔒 **Reliable Transfer**: Built-in error handling and connection validation
+- 🔗 **XMnote 集成**: 与 XMnote 服务器无缝连接，实现数据导出
+- 📤 **智能导出选项**: 支持导出全部条目、选定条目或当前分类，可自定义导出设置
+- 📂 **当前分类导出**: 新增当前分类导出功能，一键导出当前选中分类下的所有条目
+- 🎯 **智能默认选择**: 根据上下文自动选择最合适的导出范围（优先级：选中条目 > 当前分类 > 全部条目）
+- 🔄 **动态界面更新**: 导出描述文字实时更新，清楚显示将要导出的内容
+- ⚙️ **可配置服务器设置**: 简单设置 IP、端口、超时时间等参数
+- 🖱️ **右键菜单支持**: 通过右键菜单快速访问集合和条目的导出功能
+- 🌍 **多语言支持**: 提供中文和英文界面
+- 🎛️ **用户友好的首选项**: 直观的配置面板，支持实时连接测试
+- 📊 **批量处理**: 可配置批处理大小和重试机制，适用于大型数据集
+- 🔒 **可靠传输**: 内置错误处理和连接验证机制
 
-## 📥 Installation
+## 📥 安装方法
 
-### Method 1: Download from GitHub Releases (Recommended)
+### 方法一：从 GitHub Releases 下载（推荐）
 
-1. Go to the [Releases page](https://github.com/Zonezzc/zotero-xmnote/releases)
-2. Download the latest `zotero-xmnote-plugin.xpi` file
-3. In Zotero, go to **Tools** → **Add-ons**
-4. Click the gear icon ⚙️ → **Install Add-on From File**
-5. Select the downloaded `.xpi` file
-6. Restart Zotero
+1. 访问 [Releases 页面](https://github.com/Zonezzc/zotero-xmnote/releases)
+2. 下载最新的 `zotero-xmnote-plugin.xpi` 文件
+3. 在 Zotero 中，点击 **工具** → **插件**
+4. 点击齿轮图标 ⚙️ → **从文件安装插件**
+5. 选择下载的 `.xpi` 文件
+6. 重启 Zotero
 
-### Method 2: Direct Download
+### 方法二：直接下载
 
-- **Direct Link**: [Download v1.4.2](https://github.com/Zonezzc/zotero-xmnote/releases/download/v1.4.2/zotero-xmnote-plugin.xpi)
-- **File Size**: 60KB
+- **直接链接
+  **: [下载 v1.4.2](https://github.com/Zonezzc/zotero-xmnote/releases/download/v1.4.2/zotero-xmnote-plugin.xpi)
+- **文件大小**: 60KB
 - **SHA256**: `36fdf7e51c3094365573ca8f36d0405e76c919d403c64dbdaaa878ab5000bd10`
 
-## ⚙️ Configuration
+## ⚙️ 配置设置
 
-### Initial Setup
+### 初始设置
 
-1. Open Zotero preferences: **Edit** → **Preferences** (or **Zotero** → **Preferences** on macOS)
-2. Click on the **XMnote** tab
-3. Configure your server settings:
+1. 打开 Zotero 首选项：**编辑** → **首选项**（macOS 用户：**Zotero** → **首选项**）
+2. 点击 **XMnote** 标签页
+3. 配置服务器设置：
 
-### Server Settings
+### 服务器设置
 
-| Setting          | Description                        | Default         | Range       |
-| ---------------- | ---------------------------------- | --------------- | ----------- |
-| **IP Address**   | XMnote server IP address           | `192.168.1.100` | Valid IP    |
-| **Port**         | XMnote server port                 | `8080`          | 1-65535     |
-| **Timeout (ms)** | Connection timeout in milliseconds | `30000`         | 1000-300000 |
+| 设置项        | 描述               | 默认值             | 范围          |
+|------------|------------------|-----------------|-------------|
+| **IP 地址**  | XMnote 服务器 IP 地址 | `192.168.1.100` | 有效 IP       |
+| **端口**     | XMnote 服务器端口     | `8080`          | 1-65535     |
+| **超时（毫秒）** | 连接超时时间（毫秒）       | `30000`         | 1000-300000 |
 
-### Import Options
+### 导入选项
 
-| Option                  | Description            | Default    |
-| ----------------------- | ---------------------- | ---------- |
-| **Include Notes**       | Export item notes      | ✅ Enabled |
-| **Include Annotations** | Export PDF annotations | ✅ Enabled |
-| **Include Metadata**    | Export item metadata   | ✅ Enabled |
-| **Batch Size**          | Items per batch        | `10`       |
-| **Retry Count**         | Failed request retries | `3`        |
+| 选项        | 描述        | 默认值  |
+|-----------|-----------|------|
+| **包含笔记**  | 导出条目笔记    | ✅ 启用 |
+| **包含标注**  | 导出 PDF 标注 | ✅ 启用 |
+| **包含元数据** | 导出条目元数据   | ✅ 启用 |
+| **批处理大小** | 每批处理的条目数  | `10` |
+| **重试次数**  | 失败请求的重试次数 | `3`  |
 
-### Connection Testing
+### 连接测试
 
-1. After configuring server settings, click **Test Connection**
-2. The status indicator will show:
-   - 🟢 **Connected**: Server is accessible
-   - 🔴 **Failed**: Connection failed (check settings)
-   - 🟡 **Testing**: Connection in progress
+1. 配置服务器设置后，点击 **测试连接**
+2. 状态指示器将显示：
+   - 🟢 **已连接**: 服务器可访问
+   - 🔴 **失败**: 连接失败（请检查设置）
+   - 🟡 **测试中**: 连接进行中
 
-## 🚀 Usage
+## 🚀 使用方法
 
-### Export All Items
+### 智能导出选择
 
-1. Go to **Tools** → **XMnote** → **Export All Items**
-2. The plugin will export all items in your library to the configured XMnote server
-3. Progress will be shown in a popup window
+插件提供三种导出方式，并根据当前上下文智能选择默认选项：
 
-### Export Selected Items
+#### 导出选定条目（优先级最高）
 
-1. Select one or more items in your Zotero library
-2. Go to **Tools** → **XMnote** → **Export Selected Items**
-3. Only the selected items will be exported
+1. 在 Zotero 图书馆中选择一个或多个条目
+2. 点击 **工具** → **XMnote** → **导出选定条目**
+3. 导出对话框将默认选择"选定条目"选项
+4. 仅选定的条目将被导出
 
-### Context Menu Actions
+#### 导出当前分类（优先级第二）
 
-**For Collections:**
+1. 在图书馆面板中选择一个分类（集合）
+2. 点击 **工具** → **XMnote** → **导出选定条目**
+3. 如果没有选中条目，导出对话框将默认选择"当前分类"选项
+4. 当前分类下的所有条目将被导出
 
-1. Right-click on any collection in the library panel
-2. Select **Export to XMnote** from the context menu
-3. All items in the collection will be exported
+#### 导出全部条目（默认选项）
 
-**For Items:**
+1. 点击 **工具** → **XMnote** → **导出全部条目**
+2. 或者在没有选中条目和分类时，导出对话框将默认选择"全部条目"选项
+3. 插件将把您图书馆中的所有条目导出到配置的 XMnote 服务器
+4. 进度将在弹出窗口中显示
 
-1. Right-click on any item(s) in the center panel
-2. Select **Export to XMnote** from the context menu
-3. Selected item(s) will be exported
+### 导出对话框
 
-## 🔧 Technical Details
+导出对话框提供了灵活的选项：
 
-### System Requirements
+- **全部条目**：导出图书馆中的所有条目
+- **选定条目**：仅导出当前选中的条目
+- **当前分类**：导出当前选中分类下的所有条目
+- 描述文字会根据选择动态更新，清楚显示将要导出的内容数量和范围
 
-- **Zotero Version**: 7.0 or later
-- **Operating System**: Windows, macOS, Linux
-- **Network**: Access to XMnote server (local network or internet)
+### 右键菜单操作
 
-### Plugin Information
+**对于集合：**
 
-- **Plugin ID**: `zotero-xmnote`
-- **Version**: 1.0.0
-- **License**: AGPL-3.0-or-later
-- **Architecture**: Event-driven, modular design
+1. 在图书馆面板中右键点击任意集合
+2. 从右键菜单中选择 **导出到 XMnote**
+3. 集合中的所有条目将被导出
 
-### Data Format
+**对于条目：**
 
-The plugin exports Zotero items in a structured format that includes:
+1. 在中央面板中右键点击任意条目
+2. 从右键菜单中选择 **导出到 XMnote**
+3. 选定的条目将被导出
 
-- **Bibliographic metadata** (title, authors, publication details)
-- **Item notes** (if enabled)
-- **PDF annotations** (if enabled and available)
-- **Tags and collections** information
-- **File attachments** metadata
+## 🔧 技术详情
 
-## 🛠️ Development
+### 系统要求
 
-### Building from Source
+- **Zotero 版本**: 7.0 或更高版本
+- **操作系统**: Windows、macOS、Linux
+- **网络**: 能够访问 XMnote 服务器（局域网或互联网）
+
+### 插件信息
+
+- **插件 ID**: `zotero-xmnote`
+- **版本**: 1.6.0
+- **许可证**: AGPL-3.0-or-later
+- **架构**: 事件驱动、模块化设计
+
+### 数据格式
+
+插件以结构化格式导出 Zotero 条目，包括：
+
+- **书目元数据**（标题、作者、出版详情）
+- **条目笔记**（如果启用）
+- **PDF 标注**（如果启用且可用）
+- **标签和集合**信息
+- **文件附件**元数据
+
+## 🛠️ 开发
+
+### 从源码构建
 
 ```bash
-# Clone the repository
+# 克隆仓库
 git clone https://github.com/Zonezzc/zotero-xmnote.git
 cd zotero-xmnote
 
-# Install dependencies
+# 安装依赖
 npm install
 
-# Development build with hot reload
+# 开发构建（热重载）
 npm start
 
-# Production build
+# 生产构建
 npm run build
 ```
 
-### Project Structure
+### 项目结构
 
-- `src/` - TypeScript source code
-- `addon/` - Static plugin files (manifest, preferences UI, locales)
-- `releases/` - Release packages and documentation
+- `src/` - TypeScript 源代码
+- `addon/` - 静态插件文件（清单、首选项界面、本地化）
+- `releases/` - 发布包和文档
 
-## 🤝 Contributing
+## 🤝 贡献
 
-Contributions are welcome! Please feel free to submit issues, feature requests, or pull requests.
+欢迎贡献！请随时提交问题、功能请求或拉取请求。
 
-### Development Setup
+### 开发设置
 
-1. Fork this repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Make your changes and test thoroughly
-4. Commit your changes: `git commit -am 'Add your feature'`
-5. Push to the branch: `git push origin feature/your-feature`
-6. Submit a pull request
+1. Fork 此仓库
+2. 创建功能分支：`git checkout -b feature/your-feature`
+3. 进行更改并彻底测试
+4. 提交更改：`git commit -am 'Add your feature'`
+5. 推送到分支：`git push origin feature/your-feature`
+6. 提交拉取请求
 
-## 📞 Support
+## 📞 支持
 
-- **Issues**: [GitHub Issues](https://github.com/Zonezzc/zotero-xmnote/issues)
-- **Documentation**: [Project Wiki](https://github.com/Zonezzc/zotero-xmnote/wiki)
-- **Email**: zonezzc@foxmail.com
+- **问题反馈**: [GitHub Issues](https://github.com/Zonezzc/zotero-xmnote/issues)
+- **项目文档**: [项目 Wiki](https://github.com/Zonezzc/zotero-xmnote/wiki)
+- **邮箱**: zonezzc@foxmail.com
 
-## 📄 License
+## 📄 许可证
 
-This project is licensed under the AGPL-3.0-or-later License - see the [LICENSE](LICENSE) file for details.
+本项目采用 AGPL-3.0-or-later 许可证 - 详见 [LICENSE](LICENSE) 文件。
 
-## 🙏 Acknowledgments
+## 🙏 致谢
 
-- Built with [Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template)
-- Powered by [Zotero Plugin Toolkit](https://github.com/windingwind/zotero-plugin-toolkit)
-- Thanks to the Zotero development team for their excellent extensibility framework
+- 基于 [Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template) 构建
+- 由 [Zotero Plugin Toolkit](https://github.com/windingwind/zotero-plugin-toolkit) 提供支持
+- 感谢 Zotero 开发团队提供出色的扩展性框架
 
 ---
 
-⭐ **If this plugin helps you, please consider giving it a star on GitHub!**
+⭐ **如果这个插件对您有帮助，请考虑在 GitHub 上给它加星！**

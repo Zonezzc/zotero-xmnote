@@ -34,7 +34,9 @@
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
       "Bash(node:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(mv:*)",
+      "Bash(zotero-plugin release:*)"
     ],
     "deny": []
   }
