@@ -5,13 +5,13 @@
 [![GitHub](https://img.shields.io/github/license/Zonezzc/zotero-xmnote?style=flat-square)](https://github.com/Zonezzc/zotero-xmnote/blob/main/LICENSE)
 [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
 
-一个强大的 Zotero 插件，与 XMnote 服务器无缝集成，实现高效的数据导出和同步。
+一个强大的 Zotero 插件，与「纸间书摘」无缝集成，实现高效的数据导出和同步。
 
 **语言版本**: [English](README-en.md) | [简体中文](README.md)
 
 ## ✨ 功能特性
 
-- 🔗 **XMnote 集成**: 与 XMnote 服务器无缝连接，实现数据导出
+- 🔗 **「纸间书摘」集成**: 与「纸间书摘」无缝连接，实现数据导出
 - 📤 **智能导出选项**: 支持导出全部条目、选定条目或当前分类，可自定义导出设置
 - 📂 **当前分类导出**: 新增当前分类导出功能，一键导出当前选中分类下的所有条目
 - 🎯 **智能默认选择**: 根据上下文自动选择最合适的导出范围（优先级：选中条目 > 当前分类 > 全部条目）
@@ -36,10 +36,9 @@
 
 ### 方法二：直接下载
 
-- **直接链接
-  **: [下载 v1.4.2](https://github.com/Zonezzc/zotero-xmnote/releases/download/v1.4.2/zotero-xmnote-plugin.xpi)
-- **文件大小**: 60KB
-- **SHA256**: `36fdf7e51c3094365573ca8f36d0405e76c919d403c64dbdaaa878ab5000bd10`
+- **最新版本
+  **: [下载最新版本](https://github.com/Zonezzc/zotero-xmnote/releases/latest/download/zotero-xmnote-plugin.xpi)
+- **所有版本**: [查看发布页面](https://github.com/Zonezzc/zotero-xmnote/releases)
 
 ## ⚙️ 配置设置
 
@@ -51,11 +50,11 @@
 
 ### 服务器设置
 
-| 设置项           | 描述                  | 默认值          | 范围        |
-| ---------------- | --------------------- | --------------- | ----------- |
-| **IP 地址**      | XMnote 服务器 IP 地址 | `192.168.1.100` | 有效 IP     |
-| **端口**         | XMnote 服务器端口     | `8080`          | 1-65535     |
-| **超时（毫秒）** | 连接超时时间（毫秒）  | `30000`         | 1000-300000 |
+| 设置项        | 描述           | 默认值             | 范围          |
+|------------|--------------|-----------------|-------------|
+| **IP 地址**  | 「纸间书摘」 IP 地址 | `192.168.1.100` | 有效 IP       |
+| **端口**     | 「纸间书摘」端口     | `8080`          | 1-65535     |
+| **超时（毫秒）** | 连接超时时间（毫秒）   | `30000`         | 1000-300000 |
 
 ### 导入选项
 
@@ -99,7 +98,7 @@
 
 1. 点击 **工具** → **XMnote** → **导出全部条目**
 2. 或者在没有选中条目和分类时，导出对话框将默认选择"全部条目"选项
-3. 插件将把您图书馆中的所有条目导出到配置的 XMnote 服务器
+3. 插件将把您图书馆中的所有条目导出到配置的 「纸间书摘」
 4. 进度将在弹出窗口中显示
 
 ### 导出对话框
@@ -131,7 +130,7 @@
 
 - **Zotero 版本**: 7.0 或更高版本
 - **操作系统**: Windows、macOS、Linux
-- **网络**: 能够访问 XMnote 服务器（局域网或互联网）
+- **网络**: 能够访问 「纸间书摘」（局域网或互联网）
 
 ### 插件信息
 

@@ -39,10 +39,9 @@ A powerful Zotero plugin that seamlessly integrates with XMnote server for effic
 
 ### Method 2: Direct Download
 
-- **Direct Link
-  **: [Download v1.4.2](https://github.com/Zonezzc/zotero-xmnote/releases/download/v1.4.2/zotero-xmnote-plugin.xpi)
-- **File Size**: 60KB
-- **SHA256**: `36fdf7e51c3094365573ca8f36d0405e76c919d403c64dbdaaa878ab5000bd10`
+- **Latest Version
+  **: [Download Latest Version](https://github.com/Zonezzc/zotero-xmnote/releases/latest/download/zotero-xmnote-plugin.xpi)
+- **All Versions**: [View Releases Page](https://github.com/Zonezzc/zotero-xmnote/releases)
 
 ## ⚙️ Configuration
 
