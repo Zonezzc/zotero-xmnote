@@ -1,208 +1,155 @@
 # Zotero XMnote 插件
 
-[![zotero target version](https://img.shields.io/badge/Zotero-7-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Zonezzc/zotero-xmnote?style=flat-square)](https://github.com/Zonezzc/zotero-xmnote/releases)
-[![GitHub](https://img.shields.io/github/license/Zonezzc/zotero-xmnote?style=flat-square)](https://github.com/Zonezzc/zotero-xmnote/blob/main/LICENSE)
-[![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
+[![Zotero 7-10](https://img.shields.io/badge/Zotero-7--10-CC2936?style=flat-square&logo=zotero&logoColor=white)](https://www.zotero.org/)
+[![CI](https://github.com/Zonezzc/zotero-xmnote/actions/workflows/ci.yml/badge.svg)](https://github.com/Zonezzc/zotero-xmnote/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/Zonezzc/zotero-xmnote?style=flat-square)](https://github.com/Zonezzc/zotero-xmnote/releases)
+[![License](https://img.shields.io/github/license/Zonezzc/zotero-xmnote?style=flat-square)](LICENSE)
 
-一个强大的 Zotero 插件，与「纸间书摘」无缝集成，实现高效的数据导出和同步。
+把 Zotero 中的书目、笔记和 PDF 标注发送到「纸间书摘」的 API 导入列表。
 
-**语言版本**: [English](README-en.md) | [简体中文](README.md)
+> 这是一个单向导出插件，不是双向同步工具。API 返回成功仅表示数据已进入「纸间书摘」的待确认列表，仍需在 App 中手动确认导入。
 
-## ✨ 功能特性
+**语言**：[简体中文](README.md) | [English](README-en.md)
 
-- 🔗 **「纸间书摘」集成**: 与「纸间书摘」无缝连接，实现数据导出
-- 📤 **智能导出选项**: 支持导出全部条目、选定条目或当前分类，可自定义导出设置
-- 📂 **当前分类导出**: 新增当前分类导出功能，一键导出当前选中分类下的所有条目
-- 🎯 **智能默认选择**: 根据上下文自动选择最合适的导出范围（优先级：选中条目 > 当前分类 > 全部条目）
-- 🔄 **动态界面更新**: 导出描述文字实时更新，清楚显示将要导出的内容
-- ⚙️ **可配置服务器设置**: 简单设置 IP、端口、超时时间等参数
-- 🖱️ **右键菜单支持**: 通过右键菜单快速访问集合和条目的导出功能
-- 🌍 **多语言支持**: 提供中文和英文界面
-- 🎛️ **用户友好的首选项**: 直观的配置面板，支持实时连接测试
-- 📊 **批量处理**: 可配置批处理大小和重试机制，适用于大型数据集
-- 🔒 **可靠传输**: 内置错误处理和连接验证机制
+## 功能
 
-## 📥 安装方法
+- 支持 Zotero 7、8、9、10
+- 导出全部条目、选中条目或当前分类
+- 在工具菜单、条目右键菜单和分类右键菜单中快速导出
+- 导出标题、作者、译者、出版社、出版日期、ISBN、摘要、标签和分类等元数据
+- 导出 Zotero 条目笔记与 PDF 标注
+- 可选导出当前阅读位置和估算阅读时长
+- 支持批量发送、失败重试、进度提示和逐条错误信息
+- 支持完整导入 URL、域名、IPv4、IPv6 与 HTTPS
+- 连接测试只发送只读 `OPTIONS` 请求，不创建测试书籍
+- 发送前校验纸质书/电子书、位置单位、页码、阅读状态和阅读时长等 API 约束
 
-### 方法一：从 GitHub Releases 下载（推荐）
+## 兼容性
 
-1. 访问 [Releases 页面](https://github.com/Zonezzc/zotero-xmnote/releases)
-2. 下载最新的 `zotero-xmnote-plugin.xpi` 文件
-3. 在 Zotero 中，点击 **工具** → **插件**
-4. 点击齿轮图标 ⚙️ → **从文件安装插件**
-5. 选择下载的 `.xpi` 文件
-6. 重启 Zotero
+| Zotero | 菜单实现                         | 验证状态              |
+| ------ | -------------------------------- | --------------------- |
+| 7      | `zotero-plugin-toolkit` 兼容路径 | 已验证                |
+| 8      | 原生 `Zotero.MenuManager`        | 已验证                |
+| 9      | 原生 `Zotero.MenuManager`        | 已验证                |
+| 10     | 原生 `Zotero.MenuManager`        | 已通过 GitHub CI 验证 |
 
-### 方法二：直接下载
+插件通过能力检测选择菜单 API，不依赖硬编码版本分支。清单声明的支持范围为 Zotero 7–10。
 
-- **最新版本
-  **: [下载最新版本](https://github.com/Zonezzc/zotero-xmnote/releases/latest/download/zotero-xmnote-plugin.xpi)
-- **所有版本**: [查看发布页面](https://github.com/Zonezzc/zotero-xmnote/releases)
+## 安装
 
-## ⚙️ 配置设置
+1. 打开 [Releases](https://github.com/Zonezzc/zotero-xmnote/releases)。
+2. 下载最新的 `zotero-xmnote-plugin.xpi`。
+3. 在 Zotero 中打开 **工具 → 插件**。
+4. 点击齿轮按钮，选择 **从文件安装插件**。
+5. 选择下载的 `.xpi` 文件并按提示重启 Zotero。
 
-### 初始设置
+[直接下载最新版本](https://github.com/Zonezzc/zotero-xmnote/releases/latest/download/zotero-xmnote-plugin.xpi)
 
-1. 打开 Zotero 首选项：**编辑** → **首选项**（macOS 用户：**Zotero** → **首选项**）
-2. 点击 **XMnote** 标签页
-3. 配置服务器设置：
+## 快速开始
 
-### 服务器设置
+### 1. 启动纸间书摘 API 服务
 
-| 设置项           | 描述                 | 默认值          | 范围        |
-| ---------------- | -------------------- | --------------- | ----------- |
-| **IP 地址**      | 「纸间书摘」 IP 地址 | `192.168.1.100` | 有效 IP     |
-| **端口**         | 「纸间书摘」端口     | `8080`          | 1-65535     |
-| **超时（毫秒）** | 连接超时时间（毫秒） | `30000`         | 1000-300000 |
+在「纸间书摘」中打开 **API 导入** 页面并启动服务。App 会显示类似下面的地址：
 
-### 导入选项
-
-| 选项           | 描述               | 默认值  |
-| -------------- | ------------------ | ------- |
-| **包含笔记**   | 导出条目笔记       | ✅ 启用 |
-| **包含标注**   | 导出 PDF 标注      | ✅ 启用 |
-| **包含元数据** | 导出条目元数据     | ✅ 启用 |
-| **批处理大小** | 每批处理的条目数   | `10`    |
-| **重试次数**   | 失败请求的重试次数 | `3`     |
-
-### 连接测试
-
-1. 配置服务器设置后，点击 **测试连接**
-2. 状态指示器将显示：
-   - 🟢 **已连接**: 服务器可访问
-   - 🔴 **失败**: 连接失败（请检查设置）
-   - 🟡 **测试中**: 连接进行中
-
-## 🚀 使用方法
-
-### 智能导出选择
-
-插件提供三种导出方式，并根据当前上下文智能选择默认选项：
-
-#### 导出选定条目（优先级最高）
-
-1. 在 Zotero 图书馆中选择一个或多个条目
-2. 点击 **工具** → **XMnote** → **导出选定条目**
-3. 导出对话框将默认选择"选定条目"选项
-4. 仅选定的条目将被导出
-
-#### 导出当前分类（优先级第二）
-
-1. 在图书馆面板中选择一个分类（集合）
-2. 点击 **工具** → **XMnote** → **导出选定条目**
-3. 如果没有选中条目，导出对话框将默认选择"当前分类"选项
-4. 当前分类下的所有条目将被导出
-
-#### 导出全部条目（默认选项）
-
-1. 点击 **工具** → **XMnote** → **导出全部条目**
-2. 或者在没有选中条目和分类时，导出对话框将默认选择"全部条目"选项
-3. 插件将把您图书馆中的所有条目导出到配置的 「纸间书摘」
-4. 进度将在弹出窗口中显示
-
-### 导出对话框
-
-导出对话框提供了灵活的选项：
-
-- **全部条目**：导出图书馆中的所有条目
-- **选定条目**：仅导出当前选中的条目
-- **当前分类**：导出当前选中分类下的所有条目
-- 描述文字会根据选择动态更新，清楚显示将要导出的内容数量和范围
-
-### 右键菜单操作
-
-**对于集合：**
-
-1. 在图书馆面板中右键点击任意集合
-2. 从右键菜单中选择 **导出到 XMnote**
-3. 集合中的所有条目将被导出
-
-**对于条目：**
-
-1. 在中央面板中右键点击任意条目
-2. 从右键菜单中选择 **导出到 XMnote**
-3. 选定的条目将被导出
-
-## 🔧 技术详情
-
-### 系统要求
-
-- **Zotero 版本**: 7.0 或更高版本
-- **操作系统**: Windows、macOS、Linux
-- **网络**: 能够访问 「纸间书摘」（局域网或互联网）
-
-### 插件信息
-
-- **插件 ID**: `zotero-xmnote`
-- **版本**: 1.6.0
-- **许可证**: AGPL-3.0-or-later
-- **架构**: 事件驱动、模块化设计
-
-### 数据格式
-
-插件以结构化格式导出 Zotero 条目，包括：
-
-- **书目元数据**（标题、作者、出版详情）
-- **条目笔记**（如果启用）
-- **PDF 标注**（如果启用且可用）
-- **标签和集合**信息
-- **文件附件**元数据
-
-## 🛠️ 开发
-
-### 从源码构建
-
-```bash
-# 克隆仓库
-git clone https://github.com/Zonezzc/zotero-xmnote.git
-cd zotero-xmnote
-
-# 安装依赖
-npm install
-
-# 开发构建（热重载）
-npm start
-
-# 生产构建
-npm run build
+```text
+http://xmnote.local:8080/send
+http://192.168.1.20:8080/send
 ```
 
-### 项目结构
+Zotero 与运行「纸间书摘」的设备需要处于可以互相访问的网络中。
 
-- `src/` - TypeScript 源代码
-- `addon/` - 静态插件文件（清单、首选项界面、本地化）
-- `releases/` - 发布包和文档
+### 2. 配置插件
 
-## 🤝 贡献
+打开 Zotero 的 **设置/首选项 → XMnote**：
 
-欢迎贡献！请随时提交问题、功能请求或拉取请求。
+- 推荐把 App 显示的完整导入地址粘贴到 **Server Address / URL**。
+- 也可以只填写域名或 IP，再单独填写端口。
+- 使用完整 URL 时，单独的端口设置会被忽略。
+- 点击 **Test Connection (no data sent)** 检查连通性。该操作不会向待导入列表添加数据。
 
-### 开发设置
+### 3. 发送数据
 
-1. Fork 此仓库
-2. 创建功能分支：`git checkout -b feature/your-feature`
-3. 进行更改并彻底测试
-4. 提交更改：`git commit -am 'Add your feature'`
-5. 推送到分支：`git push origin feature/your-feature`
-6. 提交拉取请求
+可以通过以下入口发送：
 
-## 📞 支持
+- **工具菜单**：发送全部条目或当前选中的条目
+- **条目右键菜单**：快速发送，或打开带选项的导出窗口
+- **分类右键菜单**：发送当前分类下的条目
 
-- **问题反馈**: [GitHub Issues](https://github.com/Zonezzc/zotero-xmnote/issues)
-- **项目文档**: [项目 Wiki](https://github.com/Zonezzc/zotero-xmnote/wiki)
-- **邮箱**: zonezzc@foxmail.com
+插件会显示已被 API 接收和发送失败的数量。部分失败不会再被误报为整体成功。
 
-## 📄 许可证
+### 4. 在 App 中确认
 
-本项目采用 AGPL-3.0-or-later 许可证 - 详见 [LICENSE](LICENSE) 文件。
+发送完成后，打开「纸间书摘」的 **API 导入** 列表检查数据。只有在 App 中手动确认后，数据才会进入正式书库。
 
-## 🙏 致谢
+## 配置说明
 
-- 基于 [Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template) 构建
-- 由 [Zotero Plugin Toolkit](https://github.com/windingwind/zotero-plugin-toolkit) 提供支持
-- 感谢 Zotero 开发团队提供出色的扩展性框架
+### 服务器
 
----
+| 设置                 | 说明                      | 默认值          |
+| -------------------- | ------------------------- | --------------- |
+| Server Address / URL | 完整导入 URL，或域名/IP   | `192.168.1.100` |
+| Port                 | 仅在未填写完整 URL 时使用 | `8080`          |
+| Timeout              | 请求超时时间（毫秒）      | `30000`         |
 
-⭐ **如果这个插件对您有帮助，请考虑在 GitHub 上给它加星！**
+### 导出内容
+
+| 选项                     | 说明                               | 默认值 |
+| ------------------------ | ---------------------------------- | ------ |
+| Include Notes            | 包含 Zotero 条目笔记               | 开启   |
+| Include Annotations      | 包含 PDF 标注及评论                | 开启   |
+| Include Metadata         | 包含书目元数据、标签和分类         | 开启   |
+| Include Current Page     | 有可靠总页数和标注页码时发送当前页 | 开启   |
+| Include Reading Duration | 根据笔记时间估算每日阅读时长       | 开启   |
+
+阅读时长来自笔记时间的启发式估算，会作为模糊阅读时长发送，不会冒充精确阅读会话。没有可信来源时，插件不会擅自设置阅读状态。
+
+## 数据与行为边界
+
+- 插件只向纸间书摘 `/send` 接口发送数据，无法读取或删除 App 内已有书籍。
+- `code=200` 表示请求已被接收并等待 App 确认，不代表最终导入完成。
+- 纸质书使用页码；电子书使用进度或位置，插件会在发送前检查组合是否合法。
+- 当前页只在存在总页数和有效标注页码时发送，不再默认伪造为第 1 页。
+- Zotero 中没有可靠对应来源的购买信息、书评和阅读状态不会被自动猜测。
+
+## 开发
+
+需要 Node.js 20。
+
+```bash
+git clone https://github.com/Zonezzc/zotero-xmnote.git
+cd zotero-xmnote
+npm install
+
+# 开发模式
+npm start
+
+# 构建、格式检查和测试
+npm run build
+npm run lint:check
+npm test
+```
+
+主要目录：
+
+- `src/modules/xmnote/`：API 类型、URL、校验与客户端
+- `src/modules/zotero/`：Zotero 数据提取与转换
+- `src/modules/reading/`：估算阅读时长
+- `src/modules/ui/`：菜单、对话框与结果提示
+- `test/`：API 契约、数据转换、结果语义和版本兼容测试
+
+## 问题反馈
+
+- [GitHub Issues](https://github.com/Zonezzc/zotero-xmnote/issues)
+- 邮箱：zonezzc@foxmail.com
+
+提交问题时请附上 Zotero 版本、插件版本、操作系统以及可公开的错误信息。请勿上传私人笔记、服务器地址或其他敏感数据。
+
+## 许可证
+
+本项目采用 [AGPL-3.0-or-later](LICENSE) 许可证。
+
+## 致谢
+
+- [Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template)
+- [Zotero Plugin Toolkit](https://github.com/windingwind/zotero-plugin-toolkit)
+- Zotero 与纸间书摘的开发者和用户

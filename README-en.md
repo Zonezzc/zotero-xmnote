@@ -1,212 +1,155 @@
 # Zotero XMnote Plugin
 
-[![zotero target version](https://img.shields.io/badge/Zotero-7-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Zonezzc/zotero-xmnote?style=flat-square)](https://github.com/Zonezzc/zotero-xmnote/releases)
-[![GitHub](https://img.shields.io/github/license/Zonezzc/zotero-xmnote?style=flat-square)](https://github.com/Zonezzc/zotero-xmnote/blob/main/LICENSE)
-[![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
+[![Zotero 7-10](https://img.shields.io/badge/Zotero-7--10-CC2936?style=flat-square&logo=zotero&logoColor=white)](https://www.zotero.org/)
+[![CI](https://github.com/Zonezzc/zotero-xmnote/actions/workflows/ci.yml/badge.svg)](https://github.com/Zonezzc/zotero-xmnote/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/Zonezzc/zotero-xmnote?style=flat-square)](https://github.com/Zonezzc/zotero-xmnote/releases)
+[![License](https://img.shields.io/github/license/Zonezzc/zotero-xmnote?style=flat-square)](LICENSE)
 
-A powerful Zotero plugin that seamlessly integrates with XMnote server for efficient data export and synchronization.
+Send bibliographic data, notes, and PDF annotations from Zotero to the XMnote API import queue.
 
-**Languages**: [English](README-en.md) | [简体中文](README.md)
+> This is a one-way export plugin, not a bidirectional synchronization tool. A successful API response only means that XMnote accepted the data into its pending import list. You must still confirm the import in the app.
 
-## ✨ Features
+**Languages**: [简体中文](README.md) | [English](README-en.md)
 
-- 🔗 **XMnote Integration**: Connect Zotero with XMnote server for seamless data export
-- 📤 **Smart Export Options**: Export all items, selected items, or current collection with intelligent default selection
-- 📂 **Current Collection Export**: New collection export feature - export all items in the currently selected collection
-  with one click
-- 🎯 **Intelligent Default Selection**: Automatically selects the most appropriate export scope based on context (
-  priority: selected items > current collection > all items)
-- 🔄 **Dynamic Interface Updates**: Export description text updates in real-time, clearly showing what content will be
-  exported
-- ⚙️ **Configurable Server Settings**: Easy setup with IP, port, timeout, and other configurations
-- 🖱️ **Context Menu Support**: Quick access through right-click menus on collections and items
-- 🌍 **Multi-language Support**: Interface available in English and Chinese (Simplified)
-- 🎛️ **User-friendly Preferences**: Intuitive configuration panel with real-time connection testing
-- 📊 **Batch Processing**: Configurable batch size and retry mechanisms for large datasets
-- 🔒 **Reliable Transfer**: Built-in error handling and connection validation
+## Features
 
-## 📥 Installation
+- Supports Zotero 7, 8, 9, and 10
+- Exports all items, selected items, or the current collection
+- Provides Tools menu, item context menu, and collection context menu actions
+- Exports metadata such as title, authors, translators, publisher, publication date, ISBN, abstract, tags, and collection
+- Exports Zotero item notes and PDF annotations
+- Optionally exports the current reading position and estimated reading duration
+- Supports batched requests, retries, progress feedback, and per-item errors
+- Accepts a complete import URL, hostname, IPv4, IPv6, or HTTPS endpoint
+- Uses a read-only `OPTIONS` request for connection tests and never creates a test book
+- Validates XMnote API constraints before sending data
 
-### Method 1: Download from GitHub Releases (Recommended)
+## Compatibility
 
-1. Go to the [Releases page](https://github.com/Zonezzc/zotero-xmnote/releases)
-2. Download the latest `zotero-xmnote-plugin.xpi` file
-3. In Zotero, go to **Tools** → **Add-ons**
-4. Click the gear icon ⚙️ → **Install Add-on From File**
-5. Select the downloaded `.xpi` file
-6. Restart Zotero
+| Zotero | Menu implementation                        | Verification          |
+| ------ | ------------------------------------------ | --------------------- |
+| 7      | `zotero-plugin-toolkit` compatibility path | Verified              |
+| 8      | Native `Zotero.MenuManager`                | Verified              |
+| 9      | Native `Zotero.MenuManager`                | Verified              |
+| 10     | Native `Zotero.MenuManager`                | Verified by GitHub CI |
 
-### Method 2: Direct Download
+The plugin selects the menu API through capability detection instead of hard-coded version branches. Its manifest declares support for Zotero 7–10.
 
-- **Latest Version
-  **: [Download Latest Version](https://github.com/Zonezzc/zotero-xmnote/releases/latest/download/zotero-xmnote-plugin.xpi)
-- **All Versions**: [View Releases Page](https://github.com/Zonezzc/zotero-xmnote/releases)
+## Installation
 
-## ⚙️ Configuration
+1. Open the [Releases page](https://github.com/Zonezzc/zotero-xmnote/releases).
+2. Download the latest `zotero-xmnote-plugin.xpi`.
+3. In Zotero, open **Tools → Add-ons**.
+4. Click the gear button and choose **Install Add-on From File**.
+5. Select the downloaded `.xpi` file and restart Zotero when prompted.
 
-### Initial Setup
+[Download the latest release directly](https://github.com/Zonezzc/zotero-xmnote/releases/latest/download/zotero-xmnote-plugin.xpi)
 
-1. Open Zotero preferences: **Edit** → **Preferences** (or **Zotero** → **Preferences** on macOS)
-2. Click on the **XMnote** tab
-3. Configure your server settings:
+## Quick Start
 
-### Server Settings
+### 1. Start the XMnote API service
 
-| Setting          | Description                        | Default         | Range       |
-| ---------------- | ---------------------------------- | --------------- | ----------- |
-| **IP Address**   | XMnote server IP address           | `192.168.1.100` | Valid IP    |
-| **Port**         | XMnote server port                 | `8080`          | 1-65535     |
-| **Timeout (ms)** | Connection timeout in milliseconds | `30000`         | 1000-300000 |
+Open **API Import** in XMnote and start the service. The app displays addresses similar to:
 
-### Import Options
-
-| Option                  | Description            | Default    |
-| ----------------------- | ---------------------- | ---------- |
-| **Include Notes**       | Export item notes      | ✅ Enabled |
-| **Include Annotations** | Export PDF annotations | ✅ Enabled |
-| **Include Metadata**    | Export item metadata   | ✅ Enabled |
-| **Batch Size**          | Items per batch        | `10`       |
-| **Retry Count**         | Failed request retries | `3`        |
-
-### Connection Testing
-
-1. After configuring server settings, click **Test Connection**
-2. The status indicator will show:
-   - 🟢 **Connected**: Server is accessible
-   - 🔴 **Failed**: Connection failed (check settings)
-   - 🟡 **Testing**: Connection in progress
-
-## 🚀 Usage
-
-### Smart Export Selection
-
-The plugin offers three export methods with intelligent default selection based on current context:
-
-#### Export Selected Items (Highest Priority)
-
-1. Select one or more items in your Zotero library
-2. Go to **Tools** → **XMnote** → **Export Selected Items**
-3. The export dialog will default to "Selected Items" option
-4. Only the selected items will be exported
-
-#### Export Current Collection (Second Priority)
-
-1. Select a collection in the library panel
-2. Go to **Tools** → **XMnote** → **Export Selected Items**
-3. If no items are selected, the export dialog will default to "Current Collection" option
-4. All items in the current collection will be exported
-
-#### Export All Items (Default Option)
-
-1. Go to **Tools** → **XMnote** → **Export All Items**
-2. Or when no items or collections are selected, the export dialog will default to "All Items" option
-3. The plugin will export all items in your library to the configured XMnote server
-4. Progress will be shown in a popup window
-
-### Export Dialog
-
-The export dialog provides flexible options:
-
-- **All Items**: Export all items in the library
-- **Selected Items**: Export only currently selected items
-- **Current Collection**: Export all items in the currently selected collection
-- Description text updates dynamically based on selection, clearly showing the quantity and scope of content to be
-  exported
-
-### Context Menu Actions
-
-**For Collections:**
-
-1. Right-click on any collection in the library panel
-2. Select **Export to XMnote** from the context menu
-3. All items in the collection will be exported
-
-**For Items:**
-
-1. Right-click on any item(s) in the center panel
-2. Select **Export to XMnote** from the context menu
-3. Selected item(s) will be exported
-
-## 🔧 Technical Details
-
-### System Requirements
-
-- **Zotero Version**: 7.0 or later
-- **Operating System**: Windows, macOS, Linux
-- **Network**: Access to XMnote server (local network or internet)
-
-### Plugin Information
-
-- **Plugin ID**: `zotero-xmnote`
-- **Version**: 1.6.0
-- **License**: AGPL-3.0-or-later
-- **Architecture**: Event-driven, modular design
-
-### Data Format
-
-The plugin exports Zotero items in a structured format that includes:
-
-- **Bibliographic metadata** (title, authors, publication details)
-- **Item notes** (if enabled)
-- **PDF annotations** (if enabled and available)
-- **Tags and collections** information
-- **File attachments** metadata
-
-## 🛠️ Development
-
-### Building from Source
-
-```bash
-# Clone the repository
-git clone https://github.com/Zonezzc/zotero-xmnote.git
-cd zotero-xmnote
-
-# Install dependencies
-npm install
-
-# Development build with hot reload
-npm start
-
-# Production build
-npm run build
+```text
+http://xmnote.local:8080/send
+http://192.168.1.20:8080/send
 ```
 
-### Project Structure
+Zotero and the device running XMnote must be on networks that can reach each other.
 
-- `src/` - TypeScript source code
-- `addon/` - Static plugin files (manifest, preferences UI, locales)
-- `releases/` - Release packages and documentation
+### 2. Configure the plugin
 
-## 🤝 Contributing
+Open **Zotero Settings/Preferences → XMnote**:
 
-Contributions are welcome! Please feel free to submit issues, feature requests, or pull requests.
+- We recommend pasting the complete import address from the app into **Server Address / URL**.
+- Alternatively, enter only a hostname or IP address and specify the port separately.
+- The separate port setting is ignored when you provide a complete URL.
+- Click **Test Connection (no data sent)** to check reachability. This does not add anything to the pending import list.
 
-### Development Setup
+### 3. Send data
 
-1. Fork this repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Make your changes and test thoroughly
-4. Commit your changes: `git commit -am 'Add your feature'`
-5. Push to the branch: `git push origin feature/your-feature`
-6. Submit a pull request
+You can send data from:
 
-## 📞 Support
+- **Tools menu**: send all items or the currently selected items
+- **Item context menu**: quick send or open the export options dialog
+- **Collection context menu**: send items in the current collection
 
-- **Issues**: [GitHub Issues](https://github.com/Zonezzc/zotero-xmnote/issues)
-- **Documentation**: [Project Wiki](https://github.com/Zonezzc/zotero-xmnote/wiki)
-- **Email**: zonezzc@foxmail.com
+The plugin reports how many items XMnote accepted and how many failed. Partial failures are no longer reported as a complete success.
 
-## 📄 License
+### 4. Confirm in XMnote
 
-This project is licensed under the AGPL-3.0-or-later License - see the [LICENSE](LICENSE) file for details.
+After sending, open the **API Import** list in XMnote and review the pending data. Items enter the main library only after you confirm them in the app.
 
-## 🙏 Acknowledgments
+## Configuration
 
-- Built with [Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template)
-- Powered by [Zotero Plugin Toolkit](https://github.com/windingwind/zotero-plugin-toolkit)
-- Thanks to the Zotero development team for their excellent extensibility framework
+### Server
 
----
+| Setting              | Description                                      | Default         |
+| -------------------- | ------------------------------------------------ | --------------- |
+| Server Address / URL | Complete import URL, hostname, or IP             | `192.168.1.100` |
+| Port                 | Used only when the address is not a complete URL | `8080`          |
+| Timeout              | Request timeout in milliseconds                  | `30000`         |
 
-⭐ **If this plugin helps you, please consider giving it a star on GitHub!**
+### Exported content
+
+| Option                   | Description                                                                   | Default |
+| ------------------------ | ----------------------------------------------------------------------------- | ------- |
+| Include Notes            | Include Zotero item notes                                                     | Enabled |
+| Include Annotations      | Include PDF annotations and comments                                          | Enabled |
+| Include Metadata         | Include bibliographic metadata, tags, and collection                          | Enabled |
+| Include Current Page     | Send a current page only when total pages and an annotation page are reliable | Enabled |
+| Include Reading Duration | Estimate daily reading duration from note timestamps                          | Enabled |
+
+Reading duration is a heuristic derived from note timestamps. It is sent as fuzzy daily duration and never presented as a precise reading session. The plugin does not invent a reading status when Zotero has no trustworthy source for it.
+
+## Data and Behavior Boundaries
+
+- The plugin only sends data to XMnote's `/send` endpoint. It cannot read or delete books already stored in the app.
+- `code=200` means that XMnote accepted the request for confirmation; it does not mean that the final import has completed.
+- Physical books use pages. E-books use progress or location. The plugin validates these combinations before sending.
+- The current page is sent only when both a total page count and a valid annotation page are available. It is no longer fabricated as page 1.
+- Purchase data, reviews, and reading status are not guessed when Zotero has no reliable corresponding data.
+
+## Development
+
+Node.js 20 is required.
+
+```bash
+git clone https://github.com/Zonezzc/zotero-xmnote.git
+cd zotero-xmnote
+npm install
+
+# Development mode
+npm start
+
+# Build, lint, and test
+npm run build
+npm run lint:check
+npm test
+```
+
+Main directories:
+
+- `src/modules/xmnote/`: API types, URL handling, validation, and client
+- `src/modules/zotero/`: Zotero extraction and transformation
+- `src/modules/reading/`: reading-duration estimation
+- `src/modules/ui/`: menus, dialogs, and result feedback
+- `test/`: API contract, transformation, outcome, and compatibility tests
+
+## Support
+
+- [GitHub Issues](https://github.com/Zonezzc/zotero-xmnote/issues)
+- Email: zonezzc@foxmail.com
+
+When reporting an issue, include the Zotero version, plugin version, operating system, and any error message that is safe to share. Do not upload private notes, server addresses, or other sensitive information.
+
+## License
+
+This project is licensed under [AGPL-3.0-or-later](LICENSE).
+
+## Acknowledgments
+
+- [Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template)
+- [Zotero Plugin Toolkit](https://github.com/windingwind/zotero-plugin-toolkit)
+- The developers and users of Zotero and XMnote
