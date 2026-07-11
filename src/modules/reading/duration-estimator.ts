@@ -1,4 +1,4 @@
-import type { PreciseReadingDuration, XMnoteEntry } from "../xmnote/types";
+import type { FuzzyReadingDuration, XMnoteEntry } from "../xmnote/types";
 
 export interface ReadingEstimationConfig {
   maxSessionGap: number; // 最大会话间隔（秒）：1小时 = 3600秒
@@ -20,7 +20,7 @@ export interface ReadingSession {
 }
 
 export interface ReadingDurationResult {
-  preciseReadingDurations: PreciseReadingDuration[];
+  fuzzyReadingDurations: FuzzyReadingDuration[];
   totalReadingTime: number;
   sessions: ReadingSession[];
 }
@@ -46,7 +46,7 @@ export class ReadingDurationEstimator {
 
     if (validNotes.length === 0) {
       return {
-        preciseReadingDurations: [],
+        fuzzyReadingDurations: [],
         totalReadingTime: 0,
         sessions: [],
       };
@@ -61,15 +61,14 @@ export class ReadingDurationEstimator {
     });
 
     // 4. 生成输出数据
-    const preciseReadingDurations =
-      this.generatePreciseReadingDurations(sessions);
+    const fuzzyReadingDurations = this.generateFuzzyReadingDurations(sessions);
     const totalReadingTime = sessions.reduce(
       (total, session) => total + session.duration,
       0,
     );
 
     return {
-      preciseReadingDurations,
+      fuzzyReadingDurations,
       totalReadingTime,
       sessions,
     };
@@ -77,7 +76,10 @@ export class ReadingDurationEstimator {
 
   private preprocessNotes(notes: XMnoteEntry[]): XMnoteEntry[] {
     // 1. 过滤有效笔记（有时间戳的）
-    const validNotes = notes.filter((note) => note.time && note.time > 0);
+    const now = Math.floor(Date.now() / 1000);
+    const validNotes = notes.filter(
+      (note) => note.time && note.time > 0 && note.time <= now,
+    );
 
     // 2. 按时间排序
     return validNotes.sort((a, b) => (a.time || 0) - (b.time || 0));
@@ -94,7 +96,10 @@ export class ReadingDurationEstimator {
       } else {
         const timeDiff = (note.time || 0) - currentSession.endTime;
 
-        if (timeDiff <= this.config.maxSessionGap) {
+        if (
+          timeDiff <= this.config.maxSessionGap &&
+          this.isSameLocalDay(note.time || 0, currentSession.endTime)
+        ) {
           // 归入当前会话
           this.addNoteToSession(currentSession, note);
         } else {
@@ -140,7 +145,7 @@ export class ReadingDurationEstimator {
   private estimateSessionDuration(session: ReadingSession): number {
     if (session.notes.length === 1) {
       // 单笔记：使用固定估算时长
-      return this.config.singleNoteEstimate;
+      return Math.max(1, Math.round(this.config.singleNoteEstimate));
     }
 
     // 多笔记：基于时间跨度估算
@@ -153,41 +158,65 @@ export class ReadingDurationEstimator {
       this.config.minSessionDuration,
     );
 
-    return Math.min(adjustedDuration, this.config.maxSessionDuration);
+    return Math.max(
+      1,
+      Math.round(Math.min(adjustedDuration, this.config.maxSessionDuration)),
+    );
   }
 
-  private generatePreciseReadingDurations(
+  private generateFuzzyReadingDurations(
     sessions: ReadingSession[],
-  ): PreciseReadingDuration[] {
+  ): FuzzyReadingDuration[] {
     if (sessions.length === 0) return [];
 
-    const filteredSessions: ReadingSession[] = [];
+    const dailyDurations = new Map<number, FuzzyReadingDuration>();
 
     for (const session of sessions) {
-      if (filteredSessions.length === 0) {
-        // 添加第一个会话
-        filteredSessions.push(session);
-      } else {
-        const lastSession = filteredSessions[filteredSessions.length - 1];
-        const lastEndTime = lastSession.startTime + lastSession.duration;
-        const currentStartTime = session.startTime;
+      const date = this.toLocalDayTimestamp(session.endTime);
+      const existing = dailyDurations.get(date);
+      const durationSeconds = Math.max(1, Math.round(session.duration));
+      const lastPosition = this.getLastAvailablePosition(session.notes);
 
-        // 检查与上一个会话结束时间的间隔
-        const timeBetweenSessions = currentStartTime - lastEndTime;
-
-        if (timeBetweenSessions >= this.config.maxSessionGap) {
-          // 间隔足够大，添加新会话
-          filteredSessions.push(session);
+      if (existing) {
+        existing.durationSeconds += durationSeconds;
+        if (lastPosition !== undefined) {
+          existing.position = lastPosition;
         }
-        // 否则跳过当前会话（间隔太小）
+        continue;
+      }
+
+      dailyDurations.set(date, {
+        date,
+        durationSeconds,
+        ...(lastPosition !== undefined ? { position: lastPosition } : {}),
+      });
+    }
+
+    return [...dailyDurations.values()].sort((a, b) => a.date - b.date);
+  }
+
+  private isSameLocalDay(firstTimestamp: number, secondTimestamp: number) {
+    return (
+      this.toLocalDayTimestamp(firstTimestamp) ===
+      this.toLocalDayTimestamp(secondTimestamp)
+    );
+  }
+
+  private toLocalDayTimestamp(timestamp: number): number {
+    const date = new Date(timestamp * 1000);
+    date.setHours(0, 0, 0, 0);
+    return Math.floor(date.getTime() / 1000);
+  }
+
+  private getLastAvailablePosition(notes: XMnoteEntry[]): number | undefined {
+    for (let index = notes.length - 1; index >= 0; index--) {
+      const position = notes[index].page;
+      if (position !== undefined && position > 0) {
+        return position;
       }
     }
 
-    return filteredSessions.map((session) => ({
-      startTime: session.startTime * 1000, // 转换为毫秒
-      endTime: (session.startTime + session.duration) * 1000,
-      position: session.endPosition,
-    }));
+    return undefined;
   }
 
   // 智能调整配置参数

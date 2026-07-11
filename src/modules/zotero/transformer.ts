@@ -35,10 +35,11 @@ export class DataTransformerImpl implements DataTransformer {
     logger.debug(`Transforming item: ${item.title}`);
 
     // 基本字段转换
+    const bookType = this.determineBookType(item);
     const xmnoteNote: XMnoteNote = {
       title: item.title || "Untitled",
-      type: this.determineBookType(item),
-      locationUnit: this.determineLocationUnit(item),
+      type: bookType,
+      locationUnit: this.determineLocationUnit(bookType),
     };
 
     // 添加PDF页数信息
@@ -167,9 +168,7 @@ export class DataTransformerImpl implements DataTransformer {
   }
 
   // 确定位置单位
-  private determineLocationUnit(item: ZoteroItem): 0 | 1 | 2 {
-    const bookType = this.determineBookType(item);
-
+  private determineLocationUnit(bookType: 0 | 1): 0 | 1 | 2 {
     if (bookType === 0) {
       // 纸质书使用页码
       return 2;
@@ -294,36 +293,23 @@ export class DataTransformerImpl implements DataTransformer {
           }
         }
 
-        // 设置currentPage：有笔记则用最大页数，没有笔记则默认为1
+        // 仅在有可信注释页码时设置 currentPage
         if (maxPage > 0) {
-          xmnoteNote.currentPage = maxPage;
+          xmnoteNote.currentPage = Math.min(maxPage, xmnoteNote.totalPageCount);
           logger.info(
-            `Found max annotation page: ${maxPage} for item: ${item.title}`,
-          );
-        } else {
-          xmnoteNote.currentPage = 1;
-          logger.info(
-            `No annotations found, set currentPage to 1 as default for item: ${item.title}`,
+            `Found max annotation page: ${maxPage}, using current page ${xmnoteNote.currentPage} for item: ${item.title}`,
           );
         }
       } else {
-        // 没有totalPageCount，清除currentPage和totalPageCount字段
+        // 没有总页数时无法可靠设置当前页，但总页数和当前页是独立元数据
         logger.warn(
-          `No totalPageCount found for item: ${item.title}, removing both currentPage and totalPageCount fields to avoid import failure`,
+          `No totalPageCount found for item: ${item.title}, skipping currentPage`,
         );
         delete xmnoteNote.currentPage;
-        delete xmnoteNote.totalPageCount;
       }
     } else {
       logger.info(`Skipping current page as per configuration`);
-
-      // 不包含currentPage时，删除totalPageCount以确保成对出现
-      if (xmnoteNote.totalPageCount) {
-        logger.info(
-          `Removing totalPageCount since currentPage is not included for item: ${item.title}`,
-        );
-        delete xmnoteNote.totalPageCount;
-      }
+      delete xmnoteNote.currentPage;
     }
   }
 
@@ -410,15 +396,6 @@ export class DataTransformerImpl implements DataTransformer {
 
     // 来源
     xmnoteNote.source = "Zotero";
-
-    // 默认阅读状态为"在读"
-    xmnoteNote.readingStatus = 2;
-
-    if (item.dateAdded) {
-      xmnoteNote.readingStatusChangedDate = this.toLocalTimestamp(
-        item.dateAdded,
-      );
-    }
   }
 
   // 转换笔记和注释为条目
@@ -603,8 +580,8 @@ export class DataTransformerImpl implements DataTransformer {
       const result = estimator.estimateFromNotes(entries);
 
       // 添加到XMnote数据
-      if (result.preciseReadingDurations.length > 0) {
-        xmnoteNote.preciseReadingDurations = result.preciseReadingDurations;
+      if (result.fuzzyReadingDurations.length > 0) {
+        xmnoteNote.fuzzyReadingDurations = result.fuzzyReadingDurations;
       }
 
       logger.info(

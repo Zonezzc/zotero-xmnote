@@ -78,16 +78,12 @@ function testReadingDurationEstimator(): void {
     console.log(`  页面进度: ${session.pageProgress} 页`);
   });
 
-  console.log("\n=== 精确阅读时长 ===");
-  result.preciseReadingDurations.forEach((duration, index) => {
-    const startDate = new Date(duration.startTime);
-    const endDate = new Date(duration.endTime);
-    const durationMinutes = Math.round(
-      (duration.endTime - duration.startTime) / 60000,
-    );
-    console.log(`精确记录 ${index + 1}:`);
-    console.log(`  开始: ${startDate.toLocaleString()}`);
-    console.log(`  结束: ${endDate.toLocaleString()}`);
+  console.log("\n=== 按日估算阅读时长 ===");
+  result.fuzzyReadingDurations.forEach((duration, index) => {
+    const date = new Date(duration.date * 1000);
+    const durationMinutes = Math.round(duration.durationSeconds / 60);
+    console.log(`估算记录 ${index + 1}:`);
+    console.log(`  日期: ${date.toLocaleDateString()}`);
     console.log(`  时长: ${durationMinutes} 分钟`);
     console.log(`  位置: ${duration.position}`);
   });
