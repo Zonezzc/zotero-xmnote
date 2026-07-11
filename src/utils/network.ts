@@ -13,6 +13,12 @@ export class NetworkError extends Error {
   }
 }
 
+export interface NetworkResponse<T = unknown> {
+  status: number;
+  data: T;
+  headers: Record<string, string>;
+}
+
 export class NetworkClient {
   private timeout: number = 30000; // 默认30秒超时
 
@@ -22,11 +28,11 @@ export class NetworkClient {
     }
   }
 
-  async post(
+  async post<T = unknown>(
     url: string,
-    data: any,
+    data: unknown,
     headers: Record<string, string> = {},
-  ): Promise<any> {
+  ): Promise<NetworkResponse<T>> {
     const defaultHeaders = {
       "Content-Type": "application/json",
       ...headers,
@@ -34,9 +40,8 @@ export class NetworkClient {
 
     try {
       logger.debug(`POST request to: ${url}`);
-      logger.debug(`Request data:`, data);
 
-      const response = await this.makeRequest(url, {
+      const response = await this.makeRequest<T>(url, {
         method: "POST",
         headers: defaultHeaders,
         body: JSON.stringify(data),
@@ -49,11 +54,14 @@ export class NetworkClient {
     }
   }
 
-  async get(url: string, headers: Record<string, string> = {}): Promise<any> {
+  async get<T = unknown>(
+    url: string,
+    headers: Record<string, string> = {},
+  ): Promise<NetworkResponse<T>> {
     try {
       logger.debug(`GET request to: ${url}`);
 
-      const response = await this.makeRequest(url, {
+      const response = await this.makeRequest<T>(url, {
         method: "GET",
         headers,
       });
@@ -65,7 +73,21 @@ export class NetworkClient {
     }
   }
 
-  private async makeRequest(url: string, options: RequestInit): Promise<any> {
+  /**
+   * Perform a read-only reachability probe. Any real HTTP response, including
+   * 4xx/5xx (for example 405 when OPTIONS is unsupported), proves that the
+   * service is reachable.
+   */
+  async options(url: string): Promise<NetworkResponse<unknown>> {
+    logger.debug(`OPTIONS request to: ${url}`);
+    return this.makeRequest(url, { method: "OPTIONS" }, true);
+  }
+
+  private async makeRequest<T = unknown>(
+    url: string,
+    options: RequestInit,
+    acceptAnyHttpStatus: boolean = false,
+  ): Promise<NetworkResponse<T>> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       const timeoutId = setTimeout(() => {
@@ -78,7 +100,10 @@ export class NetworkClient {
           clearTimeout(timeoutId);
 
           try {
-            if (xhr.status >= 200 && xhr.status < 300) {
+            if (
+              (xhr.status >= 200 && xhr.status < 300) ||
+              (acceptAnyHttpStatus && xhr.status > 0)
+            ) {
               let responseData;
               try {
                 responseData = xhr.responseText
@@ -88,11 +113,11 @@ export class NetworkClient {
                 responseData = xhr.responseText;
               }
 
-              logger.info(`HTTP ${xhr.status} Response:`, responseData);
+              logger.info(`HTTP ${xhr.status} response received`);
 
               resolve({
                 status: xhr.status,
-                data: responseData,
+                data: responseData as T,
                 headers: this.parseHeaders(xhr.getAllResponseHeaders()),
               });
             } else {

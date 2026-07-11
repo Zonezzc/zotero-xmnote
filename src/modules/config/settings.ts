@@ -2,6 +2,8 @@
 
 import { config as packageConfig } from "../../../package.json";
 import { logger } from "../../utils/logger";
+import { NetworkClient } from "../../utils/network";
+import { buildXMnoteApiUrl, isCompleteXMnoteUrl } from "../xmnote/url";
 import type {
   ImportOptions,
   PluginConfig,
@@ -391,14 +393,23 @@ export class ConfigManager {
     // 验证服务器配置
     if (!config.xmnoteServer.ip) {
       errors.push("XMnote server IP is required");
-    } else if (!this.isValidIP(config.xmnoteServer.ip)) {
-      errors.push("Invalid IP address or domain name format");
+    } else {
+      try {
+        buildXMnoteApiUrl(config.xmnoteServer.ip, config.xmnoteServer.port);
+      } catch (error) {
+        errors.push(
+          error instanceof Error
+            ? error.message
+            : "Invalid IP address or domain name format",
+        );
+      }
     }
 
     if (
-      !config.xmnoteServer.port ||
-      config.xmnoteServer.port <= 0 ||
-      config.xmnoteServer.port > 65535
+      !isCompleteXMnoteUrl(config.xmnoteServer.ip) &&
+      (!config.xmnoteServer.port ||
+        config.xmnoteServer.port <= 0 ||
+        config.xmnoteServer.port > 65535)
     ) {
       errors.push("Port must be between 1 and 65535");
     }
@@ -436,22 +447,11 @@ export class ConfigManager {
     const serverConfig = config || this.getConfig().xmnoteServer;
 
     try {
-      const url = `http://${serverConfig.ip}:${serverConfig.port}/send`;
+      const url = buildXMnoteApiUrl(serverConfig.ip, serverConfig.port);
       logger.info(`Testing connection to: ${url}`);
 
-      // 创建一个简单的测试请求
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: "Connection Test",
-          type: 1,
-          locationUnit: 1,
-        }),
-        signal: AbortSignal.timeout(serverConfig.timeout || 10000),
-      });
+      const networkClient = new NetworkClient(serverConfig.timeout || 10000);
+      const response = await networkClient.options(url);
 
       // 连接成功（即使返回错误状态码，也说明服务器可达）
       logger.info(`Connection test result: ${response.status}`);
@@ -503,34 +503,6 @@ export class ConfigManager {
     const defaultConfig = this.getDefaultConfig();
     this.saveConfig(defaultConfig);
     logger.info("Configuration reset to defaults");
-  }
-
-  // 验证IP地址或域名格式
-  private isValidIP(ip: string): boolean {
-    // 检查是否为有效的IPv4地址
-    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-    if (ipRegex.test(ip)) {
-      const parts = ip.split(".");
-      return parts.every((part) => {
-        const num = parseInt(part, 10);
-        return num >= 0 && num <= 255;
-      });
-    }
-
-    // 检查是否为有效的域名格式
-    const domainRegex =
-      /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    if (domainRegex.test(ip)) {
-      // 额外检查：域名不能以点开头或结尾，不能有连续的点
-      return !ip.startsWith(".") && !ip.endsWith(".") && !ip.includes("..");
-    }
-
-    // 检查特殊域名 localhost
-    if (ip === "localhost") {
-      return true;
-    }
-
-    return false;
   }
 }
 
