@@ -3,6 +3,11 @@
 /* eslint-disable */
 // @ts-nocheck
 export type FluentMessageId =
+  | 'menu-export-all'
+  | 'menu-export-collection'
+  | 'menu-export-options'
+  | 'menu-export-selected'
+  | 'menu-quick-export'
   | 'pref-help'
   | 'startup-begin'
   | 'startup-finish';

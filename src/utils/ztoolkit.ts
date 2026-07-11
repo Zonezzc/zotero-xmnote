@@ -1,7 +1,23 @@
 import { ZoteroToolkit } from "zotero-plugin-toolkit";
 import { config } from "../../package.json";
 
-export { createZToolkit };
+export type NativeMenuManager = {
+  registerMenu(options: Record<string, unknown>): string | false;
+  unregisterMenu(menuID: string): boolean;
+};
+
+export { createZToolkit, getNativeMenuManager };
+
+function getNativeMenuManager(): NativeMenuManager | undefined {
+  const menuManager = (Zotero as any).MenuManager;
+  if (
+    typeof menuManager?.registerMenu !== "function" ||
+    typeof menuManager?.unregisterMenu !== "function"
+  ) {
+    return undefined;
+  }
+  return menuManager as NativeMenuManager;
+}
 
 function createZToolkit() {
   const _ztoolkit = new ZoteroToolkit();

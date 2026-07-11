@@ -112,9 +112,12 @@ export class ExportDialog {
   }
 
   // 从当前选中的Zotero条目创建条目信息
-  static async createSelectedItemsInfo(): Promise<ZoteroItemInfo[]> {
+  static async createSelectedItemsInfo(
+    items?: Zotero.Item[],
+  ): Promise<ZoteroItemInfo[]> {
     try {
-      const selectedItems = ztoolkit.getGlobal("ZoteroPane").getSelectedItems();
+      const selectedItems =
+        items ?? ztoolkit.getGlobal("ZoteroPane").getSelectedItems();
       if (!selectedItems || selectedItems.length === 0) {
         return [];
       }

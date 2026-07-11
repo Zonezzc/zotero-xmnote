@@ -84,8 +84,19 @@ async function onMainWindowUnload(win: Window): Promise<void> {
   ztoolkit.unregisterAll();
 }
 
-function onShutdown(): void {
+async function onShutdown(): Promise<void> {
   logger.info("Shutting down XMnote plugin");
+
+  try {
+    const [{ MenuHandler }, { ContextMenuHandler }] = await Promise.all([
+      import("./modules/ui/menuHandler"),
+      import("./modules/ui/contextMenu"),
+    ]);
+    MenuHandler.getInstance().unregisterMenuItems();
+    ContextMenuHandler.unregisterMenus();
+  } catch (error) {
+    logger.error("Failed to unregister XMnote menus:", error);
+  }
 
   ztoolkit.unregisterAll();
   // Remove addon object

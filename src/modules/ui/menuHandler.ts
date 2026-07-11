@@ -4,9 +4,14 @@ import { logger } from "../../utils/logger";
 import { ExportDialog } from "./exportDialog";
 import { getDataExporter } from "../exporter";
 import { configManager } from "../config/settings";
+import {
+  getNativeMenuManager,
+  type NativeMenuManager,
+} from "../../utils/ztoolkit";
 
 export class MenuHandler {
   private static instance: MenuHandler;
+  private nativeMenuIDs: string[] = [];
 
   static getInstance(): MenuHandler {
     if (!MenuHandler.instance) {
@@ -19,6 +24,73 @@ export class MenuHandler {
   registerMenuItems(): void {
     logger.info("Registering XMnote menu items");
 
+    const menuManager = getNativeMenuManager();
+    if (menuManager) {
+      try {
+        this.registerNativeMenuItems(menuManager);
+        logger.info("Menu items registered with Zotero.MenuManager");
+        return;
+      } catch (error) {
+        logger.warn(
+          "Native menu registration failed, falling back to ztoolkit.Menu:",
+          error,
+        );
+        this.unregisterNativeMenus(menuManager);
+      }
+    }
+
+    this.registerLegacyMenuItems();
+  }
+
+  private registerNativeMenuItems(menuManager: NativeMenuManager): void {
+    const registrations = [
+      {
+        menuID: "tools-menu",
+        pluginID: addon.data.config.addonID,
+        target: "main/menubar/tools",
+        menus: [
+          {
+            menuType: "menuitem",
+            l10nID: `${addon.data.config.addonRef}-menu-export-all`,
+            onCommand: async () => this.handleExportAll(),
+          },
+          { menuType: "separator" },
+        ],
+      },
+      {
+        menuID: "selected-item-menu",
+        pluginID: addon.data.config.addonID,
+        target: "main/library/item",
+        menus: [
+          {
+            menuType: "menuitem",
+            l10nID: `${addon.data.config.addonRef}-menu-export-selected`,
+            onShowing: (_event: Event, context: any) => {
+              context.setEnabled(
+                context.items?.some((item: Zotero.Item) =>
+                  item.isRegularItem(),
+                ) ?? false,
+              );
+            },
+            onCommand: async (_event: Event, context: any) =>
+              this.handleExportSelected(context.items),
+          },
+        ],
+      },
+    ];
+
+    for (const registration of registrations) {
+      const menuID = menuManager.registerMenu(registration);
+      if (!menuID) {
+        throw new Error(
+          `Failed to register native menu ${registration.menuID}`,
+        );
+      }
+      this.nativeMenuIDs.push(menuID);
+    }
+  }
+
+  private registerLegacyMenuItems(): void {
     try {
       // 在工具菜单中添加"Export to XMnote"选项
       ztoolkit.Menu.register("menuTools", {
@@ -42,7 +114,7 @@ export class MenuHandler {
         id: "zotero-xmnote-separator",
       });
 
-      logger.info("Menu items registered successfully");
+      logger.info("Menu items registered with ztoolkit.Menu");
     } catch (error) {
       logger.error("Failed to register menu items:", error);
     }
@@ -51,6 +123,11 @@ export class MenuHandler {
   // 移除菜单项
   unregisterMenuItems(): void {
     logger.info("Unregistering XMnote menu items");
+
+    const menuManager = getNativeMenuManager();
+    if (menuManager) {
+      this.unregisterNativeMenus(menuManager);
+    }
 
     try {
       // 移除菜单项
@@ -62,6 +139,13 @@ export class MenuHandler {
     } catch (error) {
       logger.error("Failed to unregister menu items:", error);
     }
+  }
+
+  private unregisterNativeMenus(menuManager: NativeMenuManager): void {
+    for (const menuID of this.nativeMenuIDs) {
+      menuManager.unregisterMenu(menuID);
+    }
+    this.nativeMenuIDs = [];
   }
 
   // 处理导出所有条目
@@ -87,12 +171,13 @@ export class MenuHandler {
   }
 
   // 处理导出选中条目
-  async handleExportSelected(): Promise<void> {
+  async handleExportSelected(items?: Zotero.Item[]): Promise<void> {
     logger.info("Export selected items requested");
 
     try {
       // 获取选中的条目
-      const selectedItems = Zotero.getActiveZoteroPane().getSelectedItems();
+      const selectedItems =
+        items ?? Zotero.getActiveZoteroPane().getSelectedItems();
 
       if (!selectedItems || selectedItems.length === 0) {
         this.showWarning("No items selected");
