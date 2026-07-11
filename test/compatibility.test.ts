@@ -15,10 +15,10 @@ const legacyMenuIDs = [
   "zotero-collectionmenu-xmnote-export",
 ];
 
-describe("Zotero 7/8/9 compatibility", function () {
+describe("Zotero 7/8/9/10 compatibility", function () {
   it("runs on a declared Zotero major version", function () {
     const majorVersion = Number.parseInt(Zotero.version.split(".")[0], 10);
-    assert.include([7, 8, 9], majorVersion);
+    assert.include([7, 8, 9, 10], majorVersion);
   });
 
   it("initializes the XMnote plugin", function () {
