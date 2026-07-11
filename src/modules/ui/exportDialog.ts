@@ -363,10 +363,10 @@ export class ExportDialog {
       });
 
       if (result.success) {
-        this.showSuccess(`Export completed: ${result.summary}`);
+        this.showSuccess(result.summary);
         setTimeout(() => this.window.close(), 2000);
       } else {
-        this.showError(`Export failed: ${result.errors.join(", ")}`);
+        this.showError(result.summary);
       }
     } catch (error) {
       logger.error("Export failed:", error);

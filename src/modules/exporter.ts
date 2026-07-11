@@ -74,6 +74,101 @@ export interface ExportResult {
   details: BatchImportResult | null;
 }
 
+export interface ExportOutcomeInput {
+  totalItems: number;
+  processedItems: number;
+  importResult: BatchImportResult | null;
+  duration: number;
+  dryRun?: boolean;
+}
+
+function collectImportErrors(importResult: BatchImportResult): string[] {
+  const errors = importResult.results
+    .filter((result) => !result.success)
+    .map((result) => result.message?.trim())
+    .filter((message): message is string => Boolean(message));
+
+  if (importResult.failed > errors.length) {
+    errors.push(
+      `${importResult.failed - errors.length} item(s) failed without an error message`,
+    );
+  }
+
+  return errors;
+}
+
+export function createExportOutcome({
+  totalItems,
+  processedItems,
+  importResult,
+  duration,
+  dryRun,
+}: ExportOutcomeInput): ExportResult {
+  const parts = [`Processed ${processedItems}/${totalItems} items`];
+
+  if (dryRun) {
+    parts.push("dry run - no data was sent to XMnote");
+    parts.push(`in ${(duration / 1000).toFixed(1)}s`);
+
+    return {
+      success: true,
+      totalItems,
+      processedItems,
+      successfulImports: 0,
+      failedImports: 0,
+      errors: [],
+      summary: parts.join(", "),
+      details: null,
+    };
+  }
+
+  if (!importResult) {
+    const errors = ["XMnote did not return an import result"];
+    parts.push(errors[0]);
+    parts.push(`in ${(duration / 1000).toFixed(1)}s`);
+
+    return {
+      success: false,
+      totalItems,
+      processedItems,
+      successfulImports: 0,
+      failedImports: processedItems,
+      errors,
+      summary: parts.join(", "),
+      details: null,
+    };
+  }
+
+  parts.push(`XMnote accepted ${importResult.success}`);
+  if (importResult.success > 0) {
+    parts.push("confirm the accepted items in the XMnote app");
+  }
+  if (importResult.failed > 0) {
+    parts.push(`${importResult.failed} failed`);
+  }
+
+  const errors = collectImportErrors(importResult);
+  if (errors.length > 0) {
+    parts.push(`Error: ${errors[0]}`);
+    const uniqueErrors = new Set(errors);
+    if (uniqueErrors.size > 1) {
+      parts.push(`${uniqueErrors.size} different error types`);
+    }
+  }
+  parts.push(`in ${(duration / 1000).toFixed(1)}s`);
+
+  return {
+    success: importResult.failed === 0,
+    totalItems,
+    processedItems,
+    successfulImports: importResult.success,
+    failedImports: importResult.failed,
+    errors,
+    summary: parts.join(", "),
+    details: importResult,
+  };
+}
+
 export class DataExporter {
   private extractor = getZoteroDataExtractor();
   private transformer = getDataTransformer();
@@ -128,39 +223,31 @@ export class DataExporter {
         progress.phase = "importing";
         progress.current = 0;
         progress.total = xmnoteNotes.length;
-        progress.message = "Importing data to XMnote...";
+        progress.message = "Sending data to XMnote for acceptance...";
         options.onProgress?.(progress);
 
         importResult = await this.importData(xmnoteNotes, options, progress);
       }
 
-      // 完成
-      progress.phase = "completed";
-      progress.current = progress.total;
-      progress.message = "Export completed successfully";
-      options.onProgress?.(progress);
-
       const duration = Date.now() - startTime;
-      const summary = this.generateSummary(
-        items.length,
-        xmnoteNotes.length,
-        importResult,
-        duration,
-        options.dryRun,
-      );
-
-      logger.info(`Export completed in ${duration}ms: ${summary}`);
-
-      return {
-        success: true,
+      const outcome = createExportOutcome({
         totalItems: items.length,
         processedItems: xmnoteNotes.length,
-        successfulImports: importResult?.success || 0,
-        failedImports: importResult?.failed || 0,
-        errors: [],
-        summary,
-        details: importResult,
-      };
+        importResult,
+        duration,
+        dryRun: options.dryRun,
+      });
+
+      // 完成：流程已结束，结果可能包含被 XMnote 拒绝的条目
+      progress.phase = "completed";
+      progress.current = progress.total;
+      progress.message = outcome.summary;
+      progress.errors = outcome.errors;
+      options.onProgress?.(progress);
+
+      logger.info(`Export completed in ${duration}ms: ${outcome.summary}`);
+
+      return outcome;
     } catch (error) {
       logger.error("Export process failed:", error);
 
@@ -411,7 +498,7 @@ export class DataExporter {
     options: ExportOptions,
     progress: ExportProgress,
   ): Promise<BatchImportResult> {
-    logger.info(`Importing ${notes.length} notes to XMnote`);
+    logger.info(`Sending ${notes.length} notes to XMnote`);
 
     // 导出流程中不进行连接测试，避免创建测试数据
     // 连接测试仅在配置面板中使用
@@ -432,11 +519,6 @@ export class DataExporter {
         successCount += batchResult.success;
         failedCount += batchResult.failed;
 
-        // 更新进度
-        progress.current = Math.min(i + batchSize, notes.length);
-        progress.message = `Imported ${progress.current}/${notes.length} items`;
-        options.onProgress?.(progress);
-
         // 批次间延迟
         if (i + batchSize < notes.length) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -456,6 +538,13 @@ export class DataExporter {
           });
         });
       }
+
+      // 无论本批次是全部、部分还是完全失败，都保留已接收和失败数
+      progress.current = Math.min(i + batchSize, notes.length);
+      progress.message =
+        `XMnote accepted ${successCount}/${progress.current} items; ` +
+        `${failedCount} failed`;
+      options.onProgress?.(progress);
     }
 
     return {
@@ -464,51 +553,6 @@ export class DataExporter {
       failed: failedCount,
       results,
     };
-  }
-
-  // 生成摘要
-  private generateSummary(
-    totalItems: number,
-    processedItems: number,
-    importResult: BatchImportResult | null,
-    duration: number,
-    dryRun?: boolean,
-  ): string {
-    const parts = [];
-
-    parts.push(`Processed ${processedItems}/${totalItems} items`);
-
-    if (dryRun) {
-      parts.push("(dry run - no data imported)");
-    } else if (importResult) {
-      parts.push(`Imported ${importResult.success} successfully`);
-      if (importResult.failed > 0) {
-        parts.push(`${importResult.failed} failed`);
-
-        // 添加详细的错误信息
-        const failedResults = importResult.results.filter((r) => !r.success);
-        if (failedResults.length > 0) {
-          const errorMessages = failedResults
-            .map((r) => r.message)
-            .filter((msg) => msg);
-          if (errorMessages.length > 0) {
-            // 获取第一个错误信息作为主要错误展示
-            const primaryError = errorMessages[0];
-            parts.push(`Error: ${primaryError}`);
-
-            // 如果有多个不同的错误，显示错误种类数
-            const uniqueErrors = [...new Set(errorMessages)];
-            if (uniqueErrors.length > 1) {
-              parts.push(`(${uniqueErrors.length} different error types)`);
-            }
-          }
-        }
-      }
-    }
-
-    parts.push(`in ${(duration / 1000).toFixed(1)}s`);
-
-    return parts.join(", ");
   }
 
   // 获取支持的条目类型

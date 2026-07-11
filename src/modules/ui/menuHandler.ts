@@ -220,7 +220,7 @@ export class MenuHandler {
       // 显示进度通知
       const progressWin = new ztoolkit.ProgressWindow("XMnote Export")
         .createLine({
-          text: `Exporting ${itemIds.length} items...`,
+          text: `Preparing ${itemIds.length} items for XMnote...`,
           type: "default",
         })
         .show();
@@ -240,20 +240,18 @@ export class MenuHandler {
       // 显示结果
       if (result.success) {
         progressWin.changeLine({
-          text: `Export completed: ${result.summary}`,
+          text: result.summary,
           type: "success",
         });
 
-        this.showSuccess(
-          `Successfully exported ${result.successfulImports} items to XMnote`,
-        );
+        this.showSuccess(result.summary);
       } else {
         progressWin.changeLine({
-          text: `Export failed: ${result.errors.join(", ")}`,
+          text: result.summary,
           type: "fail",
         });
 
-        this.showError(`Export failed: ${result.errors.join(", ")}`);
+        this.showError(result.summary);
       }
 
       // 3秒后关闭进度窗口
