@@ -5,7 +5,8 @@ export interface XMnoteNote {
   type: 0 | 1; // 必填：书籍类型 (0: 纸质书, 1: 电子书)
   locationUnit: 0 | 1 | 2; // 必填：页码类型 (0: 进度, 1: 位置, 2: 页码)
   bookSummary?: string; // 选填：内容简介
-  cover?: string; // 选填：书籍封面
+  cover?: string; // 选填：书籍封面 URL
+  coverBase64?: string; // 选填：Base64 封面（不能放在 cover 字段）
   author?: string; // 选填：作者
   authorIntro?: string; // 选填：作者简介
   translator?: string; // 选填：译者
@@ -15,7 +16,7 @@ export interface XMnoteNote {
   totalPageCount?: number; // 选填：总页码
   currentPage?: number; // 选填：当前阅读位置
   rating?: number; // 选填：评分 (0.0-5.0)
-  readingStatus?: 1 | 2 | 3 | 4; // 选填：阅读状态 (1: 想读, 2: 在读, 3: 已读, 4: 弃读)
+  readingStatus?: 0 | 1 | 2 | 3 | 4 | 5; // 选填：阅读状态 (0: 默认, 1: 想读, 2: 在读, 3: 已读, 4: 弃读, 5: 搁置)
   readingStatusChangedDate?: number; // 选填：状态变更日期
   group?: string; // 选填：分组
   tags?: string[]; // 选填：标签
@@ -25,6 +26,7 @@ export interface XMnoteNote {
   preciseReadingDurations?: PreciseReadingDuration[]; // 选填：精确阅读时长
   fuzzyReadingDurations?: FuzzyReadingDuration[]; // 选填：模糊阅读时长
   entries?: XMnoteEntry[]; // 选填：笔记数组
+  reviews?: XMnoteReview[]; // 选填：书评数组
 }
 
 export interface XMnoteEntry {
@@ -42,9 +44,21 @@ export interface PreciseReadingDuration {
 }
 
 export interface FuzzyReadingDuration {
-  date: string; // 必填：阅读日期
+  date: number; // 必填：阅读日期（时间戳，单位秒或毫秒）
   durationSeconds: number; // 必填：阅读时长（秒）
   position?: number; // 选填：阅读位置
+}
+
+export interface XMnoteReview {
+  title?: string; // 选填：书评标题
+  content?: string; // 选填：书评内容
+  time?: number; // 选填：创建时间（时间戳，单位秒或毫秒）
+}
+
+export interface XMnoteApiResponse<T = unknown> {
+  code: number;
+  message?: string;
+  data?: T;
 }
 
 export interface ImportResult {
