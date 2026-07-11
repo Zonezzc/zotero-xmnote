@@ -4,6 +4,11 @@ import { configManager } from "../src/modules/config/settings";
 import { DataTransformerImpl } from "../src/modules/zotero/transformer";
 import type { ZoteroAnnotation, ZoteroItem } from "../src/modules/zotero/types";
 
+const testGlobal = globalThis as typeof globalThis & {
+  ztoolkit?: { log: (...args: unknown[]) => void };
+};
+testGlobal.ztoolkit ??= { log: () => undefined };
+
 function createItem(overrides: Partial<ZoteroItem> = {}): ZoteroItem {
   return {
     id: 1,

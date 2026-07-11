@@ -7,6 +7,11 @@ import type {
 } from "../src/modules/xmnote/types";
 import { buildXMnoteApiUrl } from "../src/modules/xmnote/url";
 
+const testGlobal = globalThis as typeof globalThis & {
+  ztoolkit?: { log: (...args: unknown[]) => void };
+};
+testGlobal.ztoolkit ??= { log: () => undefined };
+
 type XMnoteTransport = Pick<NetworkClient, "options" | "post">;
 
 function createTransport(response: XMnoteApiResponse): {

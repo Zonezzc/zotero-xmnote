@@ -15,14 +15,19 @@
     </label>
 
     <hbox align="center">
-      <html:label for="xmnote-server-ip">IP Address:</html:label>
+      <html:label for="xmnote-server-ip">Server Address / URL:</html:label>
       <html:input
         type="text"
         id="xmnote-server-ip"
-        placeholder="192.168.1.100"
-        style="margin-left: 10px; width: 150px"
+        placeholder="xmnote.local or http://192.168.1.100:8080/send"
+        style="margin-left: 10px; width: 320px"
       />
     </hbox>
+
+    <html:div style="margin-top: 4px; font-size: 11px; color: #666">
+      Paste the complete import URL shown in XMnote, or enter a host and port.
+      The separate port is ignored when a complete URL is used.
+    </html:div>
 
     <hbox align="center" style="margin-top: 8px">
       <html:label for="xmnote-server-port">Port:</html:label>
@@ -49,7 +54,9 @@
     </hbox>
 
     <hbox align="center" style="margin-top: 12px">
-      <button id="xmnote-test-connection">Test Connection</button>
+      <button id="xmnote-test-connection">
+        Test Connection (no data sent)
+      </button>
       <html:span
         id="xmnote-connection-status"
         style="font-weight: bold; margin-left: 10px"
